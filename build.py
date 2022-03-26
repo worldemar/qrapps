@@ -1,39 +1,38 @@
 import os
 import qrcode
-# import urllib
 import qrcode.image.svg
 
+
 def html_to_qr(filename_html, filename_svg):
-    qr = qrcode.QRCode(image_factory=qrcode.image.svg.SvgPathImage)
-    with open(filename_html, 'rb') as f:
-        qr.add_data(f.read())
-    qr.make(fit=True)
-    img = qr.make_image()
+    qr_code = qrcode.QRCode(image_factory=qrcode.image.svg.SvgPathImage)
+    with open(filename_html, 'rb') as f_html:
+        qr_code.add_data(f_html.read())
+    qr_code.make(fit=True)
+    img = qr_code.make_image()
     img.save(filename_svg)
 
+
 def main():
-    for d in os.listdir():
-        if not os.path.isdir(d):
+    for app_directory in os.listdir():
+        if not os.path.isdir(app_directory):
             continue
         html_to_qr(
-            os.path.join(d,'app.html'),
-            os.path.join(d,'app.svg')
+            os.path.join(app_directory, 'app.html'),
+            os.path.join(app_directory, 'app.svg')
         )
     page = '<html><body>\n'
-    for d in os.listdir():
-        if not os.path.isdir(d):
+    for app_directory in os.listdir():
+        if not os.path.isdir(app_directory):
             continue
-        # url = urllib.parse.quote(open(os.path.join(d,'app.html'),'rb').read().decode('utf-8'))
-        with open(os.path.join(d,'app.svg'),'rb') as f:
-            svg = f.read().decode('utf-8')
-        # page += '<a href="" onclick="window.open(\'data:text/html,' + url + '\')">'
-        page += d
+        with open(os.path.join(app_directory, 'app.svg'), 'rb') as svg_file:
+            svg = svg_file.read().decode('utf-8')
+        page += app_directory
         page += '<br/>\n'
         page += svg
         page += '<hr>\n'
     page += '</body></html>'
-    with open('apps.html', 'wb') as f:
-        f.write(page.encode('utf-8'))
+    with open('apps.html', 'wb') as page_file:
+        page_file.write(page.encode('utf-8'))
 
 
 if __name__ == '__main__':
