@@ -16,3 +16,7 @@ Each app is HTML/JS/CSS webpage containted within own directory in `apps`. Scrip
 # Collection of QR apps! <sub>(generated automatically on push)</sub>
 ### [demo-clock](bundles/demo-clock/minibundle.html)
 
+Simplest demo showcasing proof-of-concept.
+
+![demo-clock](bundles/demo-clock/qr.svg)
+
