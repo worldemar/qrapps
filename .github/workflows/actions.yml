@@ -1,11 +1,11 @@
-name: test  CI
+name: Bundle
 
 on:
   pull_request:
   push:
 
 jobs:
-  build:
+  bundle:
     name: ${{ matrix.app }}
     runs-on: ubuntu-20.04
     strategy:
