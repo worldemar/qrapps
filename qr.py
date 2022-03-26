@@ -10,9 +10,12 @@ def html_to_qr(html_filename, svg_filename):
     qr_code = qrcode.QRCode(
         version=None,
         image_factory=qrcode.image.svg.SvgPathImage,
-        error_correction=qrcode.constants.ERROR_CORRECT_L)
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+    )
     with open(html_filename, 'rb') as f_html:
-        qr_code.add_data('data:text/html,' + f_html.read().decode('utf-8'))
+        qr_data = 'data:text/html,' + f_html.read().decode('utf-8')
+        qr_code.add_data(qr_data.encode('ascii'))
+    print(f'QR code fit size: {qr_code.best_fit()}')
     qr_code.make(fit=True)
     img = qr_code.make_image()
     img.save(svg_filename)
@@ -21,6 +24,13 @@ def html_to_qr(html_filename, svg_filename):
 def inline_scripts(html_filename, out_filename):
     subprocess.check_call([
         'inline-script-tags.cmd',
+        html_filename,
+        out_filename])
+
+
+def inline_stylesheets(html_filename, out_filename):
+    subprocess.check_call([
+        'inline-stylesheets.cmd',
         html_filename,
         out_filename])
 
@@ -47,17 +57,25 @@ def parse_args():
 def main():
     args = parse_args()
 
-    if not os.path.isdir(args.builddir):
-        os.makedirs(args.builddir)
+    app_name = os.path.basename(args.htmldir)
+    deploy_directory = os.path.join(args.builddir, app_name)
+    if not os.path.isdir(deploy_directory):
+        os.makedirs(deploy_directory)
 
-    bundle_filename = os.path.basename(args.htmldir) + '-bundle.html'
-    mini_filename = os.path.basename(args.htmldir) + '-minibundle.html'
-    svg_filename = os.path.basename(args.htmldir) + '-qrcode.svg'
+    bundle_filename = os.path.join(deploy_directory, 'bundle.html')
+    mini_filename = os.path.join(deploy_directory, 'minibundle.html')
+    svg_filename = os.path.join(deploy_directory, 'qr.svg')
 
+    tmp_file = os.path.join(args.htmldir, args.index + '.tmp')
     inline_scripts(
         os.path.join(args.htmldir, args.index),
+        tmp_file
+    )
+    inline_stylesheets(
+        tmp_file,
         os.path.join(args.builddir, bundle_filename)
     )
+    os.remove(tmp_file)
     bundle_size = os.stat(os.path.join(args.builddir, bundle_filename)).st_size
     print(f'Bundle size: {bundle_size}')
 

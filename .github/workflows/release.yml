@@ -8,9 +8,7 @@ jobs:
   bundle:
     name: ${{ matrix.app }}
     runs-on: windows-2022
-    strategy:
-      matrix:
-        app: [ demo-clock ]
+
     steps:
       - uses: actions/checkout@v2
  
@@ -31,13 +29,15 @@ jobs:
     
       - name: bundle
         run: |
-          python qr.py --htmldir=apps/${{ matrix.app }} --builddir=bundles --index=index.html
+          python qr.py --htmldir=apps/demo-clock --builddir=bundles --index=index.html
 
       - name: deploy
         run: |
+          python release.py
           git config --global user.email "woldemar@mimas.ru"
           git config --global user.name "Vladimir Looze"
           git add bundles
-          git commit -m "Release new bundles"
+          git add README.md
+          git commit -m "release new bundles"
           git push origin main
  
