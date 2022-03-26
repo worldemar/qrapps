@@ -23,9 +23,9 @@ jobs:
         uses: nizarmah/auto-minify@v2.1.1
         with:
           js_engine: uglify-js
-          directory: 'sources/apps'
+          directory: 'apps'
           output: 'apps-mini'
       - name: Compose webpage
         run: |
           python -m pip install -r requirements.txt
-          python sources/build.py
+          python build.py
