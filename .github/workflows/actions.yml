@@ -14,9 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: npm setup
-      - name: build
         run: |
           npm install -g html-minifier
           npm install -g inline-script
+      - name: bundle
           inline-script-tags ${{ matrix.app }}/index.html ${{ matrix.app }}/bundle.html
           html-minifier ${{ matrix.app }}/bundle.html --config-file ${{ matrix.app }}/minify.json
