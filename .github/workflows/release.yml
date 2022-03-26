@@ -6,7 +6,6 @@ on:
 
 jobs:
   bundle:
-    name: ${{ matrix.app }}
     runs-on: windows-2022
 
     steps:

@@ -1,19 +1,16 @@
 name: test bundles
 
 on:
-  pull_request:
+    pull_request:
 
 jobs:
   bundle:
-    name: ${{ matrix.app }}
     runs-on: windows-2022
-    strategy:
-      matrix:
-        app: [ demo-clock ]
+
     steps:
       - uses: actions/checkout@v2
  
-      - name: set up Python
+      - name: set up python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
@@ -30,6 +27,13 @@ jobs:
     
       - name: bundle
         run: |
-          rm -rf bundles
-          python qr.py --htmldir=apps/${{ matrix.app }} --builddir=bundles --index=index.html
+          python qr.py --htmldir=apps/demo-clock --builddir=bundles --index=index.html
+
+      - name: release
+        run: |
+          python release.py
+
+      - name: commit
+        run: |
+          git diff
  
