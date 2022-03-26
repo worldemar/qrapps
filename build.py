@@ -23,7 +23,7 @@ def main():
             os.path.join(app_directory, 'app.svg')
         )
     page = '<html><body>\n'
-    for app_directory in os.listdir():
+    for app_directory in os.listdir('apps'):
         if not os.path.isdir(app_directory):
             continue
         with open(os.path.join(app_directory, 'app.svg'), 'rb') as svg_file:
