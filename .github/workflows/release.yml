@@ -31,9 +31,12 @@ jobs:
         run: |
           python qr.py --htmldir=apps/demo-clock --builddir=bundles --index=index.html
 
-      - name: deploy
+      - name: release
         run: |
           python release.py
+
+      - name: commit
+        run: |
           git config --global user.email "woldemar@mimas.ru"
           git config --global user.name "Vladimir Looze"
           git add bundles
