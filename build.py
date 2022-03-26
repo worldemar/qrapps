@@ -15,7 +15,7 @@ def html_to_qr(filename_html, filename_svg):
 
 
 def main():
-    for app_directory in os.listdir():
+    for app_directory in os.listdir('apps'):
         if not os.path.isdir(app_directory):
             continue
         html_to_qr(
