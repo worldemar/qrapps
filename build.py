@@ -4,6 +4,8 @@ import qrcode.image.svg
 
 
 def html_to_qr(filename_html, filename_svg):
+    html_size = os.stat(filename_html).st_size
+    print(f'Generating QR code for {filename_html} ({html_size} bytes)')
     qr_code = qrcode.QRCode(image_factory=qrcode.image.svg.SvgPathImage)
     with open(filename_html, 'rb') as f_html:
         qr_code.add_data(f_html.read())
