@@ -27,7 +27,7 @@ jobs:
     
       - name: bundle
         run: |
-          python qr.py --htmldir=apps/demo-clock --builddir=bundles --index=index.html
+          python qr.py --htmldir=apps/demo-clock --builddir=. --index=index.html
 
       - name: release
         run: |
