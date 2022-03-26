@@ -30,5 +30,6 @@ jobs:
     
       - name: bundle
         run: |
+          rm -rf bundles
           python qr.py --htmldir=apps/${{ matrix.app }} --builddir=bundles --index=index.html
  
