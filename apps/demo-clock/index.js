@@ -1,15 +1,15 @@
-function display_time() {
-  const now = new Date();
-  let h = leading_zero(now.getHours());
-  let m = leading_zero(now.getMinutes());
-  let s = leading_zero(now.getSeconds());
-  document.getElementById('display').innerHTML =  h + " : " + m + " : " + s;
-  setTimeout(display_time, 1000);
+function dt() {
+  const n = new Date();
+  let h = lz(n.getHours());
+  let m = lz(n.getMinutes());
+  let s = lz(n.getSeconds());
+  document.getElementById('d').innerHTML =  h + " : " + m + " : " + s;
+  setTimeout(dt, 1000);
 };
 
-function leading_zero(i) {
-  if (i < 10) {i = "0" + i}; 
+function lz(i) {
+  if (i < 10) { i = "0" + i; }; 
   return i;
 };
 
-setTimeout(display_time, 1000);
+setTimeout(dt, 1000);
