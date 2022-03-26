@@ -6,10 +6,11 @@ on:
 
 jobs:
   build:
+    name: ${{ matrix.app }}
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        app: [demo-clock]
+        app: [ demo-clock ]
     steps:
       - uses: actions/checkout@v2
       - name: npm setup
