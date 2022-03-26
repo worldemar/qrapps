@@ -1,5 +1,3 @@
-<script>
-document.write('<h2 id="display"></h2>');
 function display_time() {
   const now = new Date();
   let h = leading_zero(now.getHours());
@@ -15,4 +13,3 @@ function leading_zero(i) {
 };
 
 setTimeout(display_time, 1000);
-</script>
