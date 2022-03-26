@@ -19,5 +19,6 @@ jobs:
           npm install -g inline-scripts
       - name: bundle
         run: |
-          inline-script-tags ${{ matrix.app }}/index.html ${{ matrix.app }}/bundle.html
-          html-minifier ${{ matrix.app }}/bundle.html --config-file ${{ matrix.app }}/minify.json
+          inline-script-tags apps/${{ matrix.app }}/index.html apps/${{ matrix.app }}/bundle.html
+          html-minifier apps/${{ matrix.app }}/bundle.html --config-file apps/${{ matrix.app }}/minify.json > apps/${{ matrix.app }}/bundle.html
+          cat apps/${{ matrix.app }}/bundle.html
