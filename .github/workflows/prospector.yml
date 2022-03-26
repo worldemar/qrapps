@@ -7,7 +7,7 @@ on:
 
 jobs:
   prospector:
-    runs-on: ubuntu-20.04
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3
