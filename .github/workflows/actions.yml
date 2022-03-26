@@ -22,3 +22,8 @@ jobs:
           inline-script-tags apps/${{ matrix.app }}/index.html apps/${{ matrix.app }}/bundle.html
           html-minifier apps/${{ matrix.app }}/bundle.html --config-file apps/${{ matrix.app }}/minify.json > apps/${{ matrix.app }}/bundle.html
           cat apps/${{ matrix.app }}/bundle.html
+      - name: publish
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: ${{ matrix.app }}-minipage
+          path: apps/${{ matrix.app }}/bundle.html
