@@ -17,7 +17,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install prospector
-          prospector -F --strictness veryhigh builder
+          prospector -F --strictness veryhigh build.py
       - name: JS Minify
         uses: nizarmah/auto-minify@v2.1.1
         with:
