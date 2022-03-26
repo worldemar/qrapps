@@ -1,4 +1,3 @@
 .venv
 .vs
 .vscode
-apps/*/node_modules
