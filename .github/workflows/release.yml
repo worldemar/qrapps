@@ -1,7 +1,7 @@
-name: Bundle
+name: Release
 
 on:
-  pull_request:
+  push:
 
 jobs:
   bundle:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
  
-      - name: set up Python
+      - name: set up python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
@@ -31,4 +31,12 @@ jobs:
       - name: bundle
         run: |
           python qr.py --htmldir=apps/${{ matrix.app }} --builddir=bundles --index=index.html
+
+      - name: deploy
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+          git add qrcode.png
+          git commit -m "QR Code"
+          git push origin qrcode
  
