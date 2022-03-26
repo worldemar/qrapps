@@ -1,0 +1,21 @@
+name: prospector
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  prospector:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        pip install -r requirements-contrib.txt
+    - name: Lint with prospector
+      run: |
+        prospector
