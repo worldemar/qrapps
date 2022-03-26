@@ -1,0 +1,18 @@
+<script>
+document.write('<h2 id="display"></h2>');
+function display_time() {
+  const now = new Date();
+  let h = leading_zero(now.getHours());
+  let m = leading_zero(now.getMinutes());
+  let s = leading_zero(now.getSeconds());
+  document.getElementById('display').innerHTML =  h + " : " + m + " : " + s;
+  setTimeout(display_time, 1000);
+};
+
+function leading_zero(i) {
+  if (i < 10) {i = "0" + i}; 
+  return i;
+};
+
+setTimeout(display_time, 1000);
+</script>
