@@ -1,4 +1,4 @@
-name: Bundle
+name: test bundles
 
 on:
   pull_request:
