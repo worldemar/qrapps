@@ -1,0 +1,23 @@
+name: prospector
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  prospector:
+    runs-on: windows-2022
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install -r requirements-contrib.txt
+    - name: lint with prospector
+      run: |
+        prospector

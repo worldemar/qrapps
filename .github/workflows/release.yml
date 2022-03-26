@@ -1,0 +1,43 @@
+name: release bundles
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  bundle:
+    name: ${{ matrix.app }}
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        app: [ demo-clock ]
+    steps:
+      - uses: actions/checkout@v2
+ 
+      - name: set up python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+ 
+      - name: install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: set up npm
+        run: |
+          npm install -g html-minifier
+          npm install -g inline-scripts
+    
+      - name: bundle
+        run: |
+          python qr.py --htmldir=apps/${{ matrix.app }} --builddir=bundles --index=index.html
+
+      - name: deploy
+        run: |
+          git config --global user.email "woldemar@mimas.ru"
+          git config --global user.name "Vladimir Looze"
+          git add bundles
+          git commit -m "Release new bundles"
+          git push origin main
+ 
