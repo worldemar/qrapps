@@ -16,12 +16,10 @@ var BUF_I = _new_buf(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(C_I));
 var vertCode = 
    'attribute vec3 position;'+
    'attribute vec3 color;'+
-   'uniform mat4 Pmtx;'+
-   'uniform mat4 Vmtx;'+
-   'uniform mat4 Mmtx;'+
+   'uniform mat4 mtx;'+
    'varying vec3 vColor;'+
    'void main(void) { '+
-      'gl_Position = Pmtx*Vmtx*Mmtx*vec4(position, 1.);'+
+      'gl_Position = mtx*vec4(position, 1.);'+
       'vColor = color;'+
    '}';
 
@@ -43,10 +41,7 @@ gl.attachShader(_sp, _vS);
 gl.attachShader(_sp, _fS);
 gl.linkProgram(_sp);
 
-_gu = (s, n) => gl.getUniformLocation(s, n);
-_Pmtx = _gu(_sp, "Pmtx");
-_Vmtx = _gu(_sp, "Vmtx");
-_Mmtx = _gu(_sp, "Mmtx");
+_mtx = gl.getUniformLocation(_sp, "mtx");
 
 _glbb = (b, s) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, b);
@@ -90,10 +85,7 @@ var animate = function(time) {
    gl.viewport(0.0, 0.0, CW, CH);
    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-   _gum4 = (a, b, c) => gl.uniformMatrix4fv(a, b, c);
-   _gum4(_Pmtx, false, prj_mtx);
-   _gum4(_Vmtx, false, vw_mtx);
-   _gum4(_Mmtx, false, mdl_mtx);
+   gl.uniformMatrix4fv(_mtx, false, m4MM(prj_mtx,m4MM(vw_mtx, mdl_mtx)));
 
    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, BUF_I);
    gl.drawElements(gl.TRIANGLES, C_I.length, gl.UNSIGNED_SHORT, 0);
