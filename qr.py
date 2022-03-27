@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import subprocess
 import qrcode
@@ -15,7 +16,10 @@ def html_to_qr(html_filename, svg_filename):
     with open(html_filename, 'rb') as f_html:
         qr_data = 'data:text/html,' + f_html.read().decode('utf-8')
         qr_code.add_data(qr_data.encode('ascii'))
-    print(f'QR code fit size: {qr_code.best_fit()}')
+        print('Data chunks ready:')
+        for i in qr_code.data_list:
+            print(f'- bytes={len(i.data)} mode={i.mode} content={i.data[:64]}')
+        print(f'QR code fit size: {qr_code.best_fit()}')
     qr_code.make(fit=True)
     img = qr_code.make_image()
     img.save(svg_filename)
@@ -83,7 +87,7 @@ def main():
         os.path.join(args.htmldir, 'minify.json')
     )
     mini_size = os.stat(mini_filename).st_size
-    print(f'Mini size: {mini_size}')
+    print(f'Mini size: {mini_size}/2953')
 
     html_to_qr(
         mini_filename,
