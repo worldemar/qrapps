@@ -32,10 +32,10 @@ jobs:
 
       - name: generate README.md
         run: |
-          Remove-Item -Path github.io -Force -Recurse
-          mv bundles github.io
+          Remove-Item -Path docs -Force -Recurse
+          mv bundles docs
           python release.py
-          tree /f github.io
+          tree /f docs
 
       - name: release
         run: |

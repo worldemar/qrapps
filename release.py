@@ -13,7 +13,7 @@ def write_app_info(app_name, readme_file):
 
 
 def main():
-    with open(os.path.join('github.io', 'README.md'), 'wb') as readme_pages:
+    with open(os.path.join('docs', 'README.md'), 'wb') as readme_pages:
         with open('README.md', 'rb') as readme_github:
             readme_pages.write(readme_github.read())
         for app_name in os.listdir('apps'):
