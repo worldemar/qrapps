@@ -1,5 +1,4 @@
 import os
-import sys
 import argparse
 import subprocess
 import qrcode
@@ -10,7 +9,7 @@ import qrcode.constants
 def html_to_qr(html_filename, svg_filename):
     qr_code = qrcode.QRCode(
         version=None,
-        image_factory=qrcode.image.svg.SvgPathImage,
+        image_factory=qrcode.image.svg.SvgPathFillImage,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
     )
     with open(html_filename, 'rb') as f_html:
