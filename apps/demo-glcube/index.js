@@ -71,7 +71,7 @@ vw_mtx[14] = -3; /* -5 units back off zero so we can see origin */
 
 var A = 0;
 
-animate = (time) => {
+anim = (time) => {
   mdl_mtx = _m_i /* model matrix */
 
   mdl_mtx = mrY(mdl_mtx, A);
@@ -89,8 +89,8 @@ animate = (time) => {
    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, BUF_I);
    gl.drawElements(gl.TRIANGLES, C_I.length, gl.UNSIGNED_SHORT, 0);
 
-  A += 0.01;
+   A += 0.01;
 
-   requestAnimationFrame(animate);
+   requestAnimationFrame(anim);
 }
-animate(0);
+anim(0);
