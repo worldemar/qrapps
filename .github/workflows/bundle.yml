@@ -29,11 +29,3 @@ jobs:
         run: |
           python qr.py --htmldir=apps/demo-clock --builddir=bundles --index=index.html
 
-      - name: generate README.md
-        run: |
-          python release.py
-
-      - name: list
-        run: |
-          tree /f
- 

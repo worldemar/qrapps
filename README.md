@@ -14,10 +14,5 @@ Fitting entire app in one QR code also keeps them relatively small and simple...
 Each app is HTML/JS/CSS webpage containted within own directory in `apps`. Script [`qr.py`](qr.py) will convert each app into [QR code](https://en.wikipedia.org/wiki/QR_code) by 'minifying'/'uglyfying' it and inlining all code into single HTML. This HTML then encoded as QR code [Data URL](https://en.wikipedia.org/wiki/Data_URI_scheme)
 
 # Collection of QR apps!
-Generated automatically on push, published to https://worldemar.github.io/qrapps/ (also guarantees white background)
-### [demo-clock](bundles/demo-clock/minibundle.html)
-
-Simplest demo showcasing proof-of-concept.
-
-![demo-clock](bundles/demo-clock/qr.svg)
+Generated automatically on push and published to [GitHub Pages](https://worldemar.github.io/qrapps/)
 

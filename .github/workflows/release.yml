@@ -32,13 +32,15 @@ jobs:
 
       - name: generate README.md
         run: |
+          rm -rf github.io
+          mv bundles github.io
           python release.py
+          tree /f github.io
 
       - name: release
         run: |
           git config --global user.email "woldemar@mimas.ru"
           git config --global user.name "Vladimir Looze"
-          tree /f
           git add bundles
           git add README.md
           git commit -m "release new bundles"
