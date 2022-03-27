@@ -17,14 +17,14 @@ Each app is HTML/JS/CSS webpage containted within own directory in `apps`. Scrip
 
 ## Collection of QR apps!
 Generated automatically on push and published to https://worldemar.github.io/qrapps/
+### [demo-canvas](demo-canvas/minibundle.html)
+
+Simple demo showcasing mouse tracking
+![demo-canvas](demo-canvas/qr.svg)
+
 ### [demo-clock](demo-clock/minibundle.html)
 
 Simplest demo showcasing proof-of-concept.
 
 ![demo-clock](demo-clock/qr.svg)
-
-### [demo-mousetracking](demo-mousetracking/minibundle.html)
-
-Simple demo showcasing mouse tracking
-![demo-mousetracking](demo-mousetracking/qr.svg)
 
