@@ -32,7 +32,7 @@ jobs:
 
       - name: generate README.md
         run: |
-          del /s /q github.io
+          del /F /S /Q github.io
           mv bundles github.io
           python release.py
           tree /f github.io
