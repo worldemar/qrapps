@@ -29,6 +29,7 @@ jobs:
       - name: generate QR
         run: |
           python qr.py --htmldir=apps/demo-clock --builddir=bundles --index=index.html
+          python qr.py --htmldir=apps/demo-mousetracking --builddir=bundles --index=index.html
 
       - name: generate README.md
         run: |
