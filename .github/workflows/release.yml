@@ -28,7 +28,7 @@ jobs:
 
       - name: generate QR
         run: |
-          python qrs.py --htmldirs=apps --builddir=bundles --index=index.html
+          python qrs.py --htmldirs=apps --builddir=bundles
 
       - name: generate README.md
         run: |
