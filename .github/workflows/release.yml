@@ -25,17 +25,11 @@ jobs:
         run: |
           npm install -g html-minifier
           npm install -g inline-scripts
-    
-      - name: bundle
-        run: |
-          python qr.py --htmldir=apps/demo-clock --builddir=. --index=index.html
 
       - name: release
         run: |
+          python qr.py --htmldir=apps/demo-clock --builddir=. --index=index.html
           python release.py
-
-      - name: commit
-        run: |
           git config --global user.email "woldemar@mimas.ru"
           git config --global user.name "Vladimir Looze"
           git diff
