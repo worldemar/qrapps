@@ -4,7 +4,7 @@
 Collection of miniature apps/minigames that fit into a single QR code.
 These codes can be scanned and content pasted directly into browser URL.
 All apps follow same rules:
-@ -6,14 +8,14 @@ All apps follow same rules:
+
 - Fit within single QR code, any tricks are okay as long as QR code is scannable.
 - Do not require any external resources, fully operable if scanned from paper without internet conenction.
 
