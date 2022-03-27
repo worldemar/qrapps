@@ -24,16 +24,16 @@ jobs:
         run: |
           npm install -g html-minifier
           npm install -g inline-scripts
-    
-      - name: bundle
-        run: |
-          python qr.py --htmldir=apps/demo-clock --builddir=. --index=index.html
 
-      - name: release
+      - name: generate QR
+        run: |
+          python qr.py --htmldir=apps/demo-clock --builddir=bundles --index=index.html
+
+      - name: generate README.md
         run: |
           python release.py
 
-      - name: commit
+      - name: list
         run: |
-          git diff
+          tree /f
  

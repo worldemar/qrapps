@@ -26,12 +26,21 @@ jobs:
           npm install -g html-minifier
           npm install -g inline-scripts
 
-      - name: release
+      - name: generate QR
         run: |
           python qr.py --htmldir=apps/demo-clock --builddir=bundles --index=index.html
+
+      - name: generate README.md
+        run: |
           python release.py
+
+      - name: release
+        run: |
           git config --global user.email "woldemar@mimas.ru"
           git config --global user.name "Vladimir Looze"
-          git diff
           tree /f
+          git add bundles
+          git add README.md
+          git commit -m "release new bundles"
+          git push origin main
  
