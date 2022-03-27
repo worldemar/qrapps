@@ -1,16 +1,14 @@
 var canvas = document.getElementById('gl');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+CW = canvas.width = window.innerWidth;
+CH = canvas.height = window.innerHeight;
 gl = canvas.getContext('webgl');
 
-zz = (x,y) => { x += 1; y+=1; return x+y; }
 _new_buf = (t, a) => {
-  b = gl.createBuffer ();
+  b = gl.createBuffer();
   gl.bindBuffer(t, b);
   gl.bufferData(t, a, gl.STATIC_DRAW);
   return b;
 }
-
 var BUF_V = _new_buf(gl.ARRAY_BUFFER, new Float32Array(C_V));
 var BUF_C = _new_buf(gl.ARRAY_BUFFER, new Float32Array(C_C));
 var BUF_I = _new_buf(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(C_I));
@@ -32,46 +30,47 @@ var fragCode =
   'varying vec3 vColor;'+
   'void main(void) { gl_FragColor = vec4(vColor, 1.0); }';
 
-var vertShader = gl.createShader(gl.VERTEX_SHADER);
-gl.shaderSource(vertShader, vertCode);
-gl.compileShader(vertShader);
+_new_shdr = (t, c) => {
+  _shd = gl.createShader(t);
+  gl.shaderSource(_shd, c);
+  gl.compileShader(_shd);
+  return _shd;
+}
+_vS = _new_shdr(gl.VERTEX_SHADER, vertCode);
+_fS = _new_shdr(gl.FRAGMENT_SHADER, fragCode);
+_sp = gl.createProgram();
+gl.attachShader(_sp, _vS);
+gl.attachShader(_sp, _fS);
+gl.linkProgram(_sp);
 
-var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-gl.shaderSource(fragShader, fragCode);
-gl.compileShader(fragShader);
+_gu = (s, n) => gl.getUniformLocation(s, n);
+_Pmtx = _gu(_sp, "Pmtx");
+_Vmtx = _gu(_sp, "Vmtx");
+_Mmtx = _gu(_sp, "Mmtx");
 
-var shaderprogram = gl.createProgram();
-gl.attachShader(shaderprogram, vertShader);
-gl.attachShader(shaderprogram, fragShader);
-gl.linkProgram(shaderprogram);
+_glbb = (b, s) => {
+  gl.bindBuffer(gl.ARRAY_BUFFER, b);
+  _z = gl.getAttribLocation(_sp, s);
+  gl.vertexAttribPointer(_z, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(_z);
+}
+_glbb(BUF_V, "position");
+_glbb(BUF_C, "color");
 
-var _Pmtx = gl.getUniformLocation(shaderprogram, "Pmtx");
-var _Vmtx = gl.getUniformLocation(shaderprogram, "Vmtx");
-var _Mmtx = gl.getUniformLocation(shaderprogram, "Mmtx");
+gl.useProgram(_sp);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, BUF_V);
-var _position = gl.getAttribLocation(shaderprogram, "position");
-gl.vertexAttribPointer(_position, 3, gl.FLOAT, false,0,0);
-gl.enableVertexAttribArray(_position);
-
-gl.bindBuffer(gl.ARRAY_BUFFER, BUF_C);
-var _color = gl.getAttribLocation(shaderprogram, "color");
-gl.vertexAttribPointer(_color, 3, gl.FLOAT, false,0,0) ;
-gl.enableVertexAttribArray(_color);
-gl.useProgram(shaderprogram);
-
-function _m_proj(angle, a, zMin, zMax) {
+_m_prj = (a, as, zMin, zMax) => {
   var dz = (zMax-zMin);
-  var ang = Math.tan((angle*.5)*Math.PI/180);
+  var ang = Math.tan((a)*3.14/360); // Math.tan((angle*.5)*Math.PI/180);
   return [
       0.5/ang,         0,                 0,   0,
-            0, 0.5*a/ang,                 0,   0,
+            0,  as/ang/2,                 0,   0,
             0,         0,   -(zMax+zMin)/dz,  -1,
             0,         0, (-2*zMax*zMin)/dz,   0 
     ];
 }
 
-var prj_mtx = _m_proj(40, canvas.width/canvas.height, 1, 100);
+var prj_mtx = _m_prj(40, CW/CH, 1, 100);
 var mdl_mtx = _m_i /* model matrix */
 var vw_mtx = _m_i /* view matrix */
 vw_mtx[14] = -3; /* -5 units back off zero so we can see origin */
@@ -88,12 +87,13 @@ var animate = function(time) {
    gl.enable(gl.DEPTH_TEST);
    gl.clearColor(0, 0, 0, 1);
    gl.clearDepth(1.0);
-   gl.viewport(0.0, 0.0, canvas.width, canvas.height);
+   gl.viewport(0.0, 0.0, CW, CH);
    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-   gl.uniformMatrix4fv(_Pmtx, false, prj_mtx);
-   gl.uniformMatrix4fv(_Vmtx, false, vw_mtx);
-   gl.uniformMatrix4fv(_Mmtx, false, mdl_mtx);
+   _gum4 = (a, b, c) => gl.uniformMatrix4fv(a, b, c);
+   _gum4(_Pmtx, false, prj_mtx);
+   _gum4(_Vmtx, false, vw_mtx);
+   _gum4(_Mmtx, false, mdl_mtx);
 
    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, BUF_I);
    gl.drawElements(gl.TRIANGLES, C_I.length, gl.UNSIGNED_SHORT, 0);
