@@ -19,7 +19,8 @@ Each app is HTML/JS/CSS webpage containted within own directory in `apps`. Scrip
 Generated automatically on push and published to https://worldemar.github.io/qrapps/
 ### [demo-canvas](demo-canvas/minibundle.html)
 
-Simple demo showcasing mouse tracking
+Simple demo showcasing mouse tracking and canvas drawing
+
 ![demo-canvas](demo-canvas/qr.svg)
 
 ### [demo-clock](demo-clock/minibundle.html)
@@ -27,4 +28,13 @@ Simple demo showcasing mouse tracking
 Simplest demo showcasing proof-of-concept.
 
 ![demo-clock](demo-clock/qr.svg)
+
+### [demo-glcube](demo-glcube/minibundle.html)
+
+Simple demo showcasing rotating cube using WebGL.
+Uses internal 600-character matrix library and no engine.
+Fitting it into QR code was not easy nor pretty, some parts of code are not very readable.
+Building more complex WebGL app would likely require different approach (shaders?)
+or more agressive minifying/uglifying
+![demo-glcube](demo-glcube/qr.svg)
 
