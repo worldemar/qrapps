@@ -34,6 +34,7 @@ jobs:
         run: |
           Remove-Item -Path docs -Force -Recurse
           mv bundles docs
+          git checkout -- docs/_config.yml
           python release.py
           tree /f docs
 
