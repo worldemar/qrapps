@@ -1,4 +1,5 @@
 import os
+import shutil
 import argparse
 import subprocess
 import qrcode
@@ -45,6 +46,15 @@ def minify(html_filename, out_filename, config_file):
         html_filename,
         '--output', out_filename])
 
+def uglify(html_dir):
+    js_filter = lambda x: x.endswith('.js')
+    list_dir = os.listdir(html_dir)
+    js_files = list(os.path.join(html_dir, x) for x in filter(js_filter, list_dir))
+    subprocess.check_call([
+        'uglifyjs.cmd',
+        '--in-situ',
+        '--config-file', os.path.join(html_dir, 'uglify.json'),
+        '--'] + js_files)
 
 def parse_args():
     parser = argparse.ArgumentParser('Convert HTML page into QR code')
@@ -58,6 +68,7 @@ def parse_args():
 def main():
     args = parse_args()
 
+    html_tmp_dir = os.path.basename(args.htmldir) + '.tmp'
     app_name = os.path.basename(args.htmldir)
     deploy_directory = os.path.join(args.builddir, app_name)
     if not os.path.isdir(deploy_directory):
@@ -67,9 +78,14 @@ def main():
     mini_filename = os.path.join(deploy_directory, 'minibundle.html')
     svg_filename = os.path.join(deploy_directory, 'qr.svg')
 
-    tmp_file = os.path.join(args.htmldir, 'index.html.tmp')
+    if os.path.isdir(html_tmp_dir):
+        shutil.rmtree(html_tmp_dir)
+    shutil.copytree(args.htmldir, html_tmp_dir)
+    uglify(html_tmp_dir)
+
+    tmp_file = os.path.join(html_tmp_dir, 'index.html.tmp')
     inline_scripts(
-        os.path.join(args.htmldir, 'index.html'),
+        os.path.join(html_tmp_dir, 'index.html'),
         tmp_file
     )
     inline_stylesheets(
@@ -83,7 +99,7 @@ def main():
     minify(
         bundle_filename,
         mini_filename,
-        os.path.join(args.htmldir, 'minify.json')
+        os.path.join(html_tmp_dir, 'minify.json')
     )
     mini_size = os.stat(mini_filename).st_size
     print(f'Mini size: {mini_size}/2953')
