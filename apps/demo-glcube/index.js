@@ -14,34 +14,33 @@ var BUF_C = _new_buf(gl.ARRAY_BUFFER, new Float32Array(C_C));
 var BUF_I = _new_buf(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(C_I));
 
 var vertCode = 
-   'attribute vec3 position;'+
-   'attribute vec3 color;'+
-   'uniform mat4 mtx;'+
-   'varying vec3 vColor;'+
+   'attribute vec3 p;'+ // position
+   'attribute vec3 c;'+ // color
+   'uniform mat4 m;'+ // combined matrix
+   'varying vec3 C;'+ // color to pass to frag
    'void main(void) { '+
-      'gl_Position = mtx*vec4(position, 1.);'+
-      'vColor = color;'+
+      'gl_Position = m*vec4(p, 1.);'+
+      'C = c;'+
    '}';
 
 var fragCode = 
-  'precision mediump float;'+
-  'varying vec3 vColor;'+
-  'void main(void) { gl_FragColor = vec4(vColor, 1.0); }';
+  'precision lowp float;'+
+  'varying vec3 C;'+
+  'void main(void) { gl_FragColor = vec4(C, 1.0); }';
 
-_new_shdr = (t, c) => {
+_sp = gl.createProgram();
+_n_shd = (t, c) => {
   _shd = gl.createShader(t);
   gl.shaderSource(_shd, c);
   gl.compileShader(_shd);
+  gl.attachShader(_sp, _shd);
   return _shd;
 }
-_vS = _new_shdr(gl.VERTEX_SHADER, vertCode);
-_fS = _new_shdr(gl.FRAGMENT_SHADER, fragCode);
-_sp = gl.createProgram();
-gl.attachShader(_sp, _vS);
-gl.attachShader(_sp, _fS);
+_vS = _n_shd(gl.VERTEX_SHADER, vertCode);
+_fS = _n_shd(gl.FRAGMENT_SHADER, fragCode);
 gl.linkProgram(_sp);
 
-_mtx = gl.getUniformLocation(_sp, "mtx");
+_mtx = gl.getUniformLocation(_sp, "m");
 
 _glbb = (b, s) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, b);
@@ -49,8 +48,8 @@ _glbb = (b, s) => {
   gl.vertexAttribPointer(_z, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(_z);
 }
-_glbb(BUF_V, "position");
-_glbb(BUF_C, "color");
+_glbb(BUF_V, "p");
+_glbb(BUF_C, "c");
 
 gl.useProgram(_sp);
 
@@ -70,13 +69,13 @@ var mdl_mtx = _m_i /* model matrix */
 var vw_mtx = _m_i /* view matrix */
 vw_mtx[14] = -3; /* -5 units back off zero so we can see origin */
 
-var THETA = 0;
+var A = 0;
 
-var animate = function(time) {
+animate = (time) => {
   mdl_mtx = _m_i /* model matrix */
 
-  mdl_mtx = mrY(mdl_mtx, THETA);
-  mdl_mtx = mrX(mdl_mtx, -THETA);
+  mdl_mtx = mrY(mdl_mtx, A);
+  mdl_mtx = mrX(mdl_mtx, -A);
 
    time_old = time; 
    gl.enable(gl.DEPTH_TEST);
@@ -90,7 +89,7 @@ var animate = function(time) {
    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, BUF_I);
    gl.drawElements(gl.TRIANGLES, C_I.length, gl.UNSIGNED_SHORT, 0);
 
-  THETA += 0.01;
+  A += 0.01;
 
    requestAnimationFrame(animate);
 }
