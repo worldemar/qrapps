@@ -76,20 +76,20 @@ def main():
         bundle_filename
     )
     os.remove(tmp_file)
-    bundle_size = os.stat(os.path.join(args.builddir, bundle_filename)).st_size
+    bundle_size = os.stat(bundle_filename).st_size
     print(f'Bundle size: {bundle_size}')
 
     minify(
-        os.path.join(args.builddir, bundle_filename),
-        os.path.join(args.builddir, mini_filename),
+        bundle_filename,
+        mini_filename,
         os.path.join(args.htmldir, 'minify.json')
     )
-    mini_size = os.stat(os.path.join(args.builddir, mini_filename)).st_size
+    mini_size = os.stat(mini_filename).st_size
     print(f'Mini size: {mini_size}')
 
     html_to_qr(
-        os.path.join(args.builddir, mini_filename),
-        os.path.join(args.builddir, svg_filename)
+        mini_filename,
+        svg_filename
     )
 
 
