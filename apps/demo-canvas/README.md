@@ -1,1 +1,1 @@
-Simple demo showcasing mouse tracking
+Simple demo showcasing mouse tracking and canvas drawing
