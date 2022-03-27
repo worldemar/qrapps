@@ -49,8 +49,6 @@ def parse_args():
                         help='directory with html page')
     parser.add_argument('--builddir',
                         help='directory to put bundle and QR code into')
-    parser.add_argument('--index',
-                        help='filename of root document')
     return parser.parse_args()
 
 
@@ -66,9 +64,9 @@ def main():
     mini_filename = os.path.join(deploy_directory, 'minibundle.html')
     svg_filename = os.path.join(deploy_directory, 'qr.svg')
 
-    tmp_file = os.path.join(args.htmldir, args.index + '.tmp')
+    tmp_file = os.path.join(args.htmldir, 'index.html.tmp')
     inline_scripts(
-        os.path.join(args.htmldir, args.index),
+        os.path.join(args.htmldir, 'index.html'),
         tmp_file
     )
     inline_stylesheets(
