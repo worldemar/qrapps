@@ -52,7 +52,7 @@ m4MM = (a, b) => Array().concat(
 );
 
 /* rotate matrix m by angle a along X */
-MrX = (m, a) => m4MM(m, _m_rotX(a));
+mrX = (m, a) => m4MM(m, _m_rotX(a));
 
 /* rotate matrix m by angle a along Y */
-MrY = (m, a) => m4MM(m, _m_rotY(a));
+mrY = (m, a) => m4MM(m, _m_rotY(a));

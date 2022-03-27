@@ -81,8 +81,8 @@ var THETA = 0;
 var animate = function(time) {
   mdl_mtx = _m_i /* model matrix */
 
-  mdl_mtx = MrY(mdl_mtx, THETA);
-  mdl_mtx = MrX(mdl_mtx, -THETA);
+  mdl_mtx = mrY(mdl_mtx, THETA);
+  mdl_mtx = mrX(mdl_mtx, -THETA);
 
    time_old = time; 
    gl.enable(gl.DEPTH_TEST);
