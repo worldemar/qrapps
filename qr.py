@@ -73,7 +73,7 @@ def main():
     )
     inline_stylesheets(
         tmp_file,
-        os.path.join(args.builddir, bundle_filename)
+        bundle_filename
     )
     os.remove(tmp_file)
     bundle_size = os.stat(os.path.join(args.builddir, bundle_filename)).st_size
