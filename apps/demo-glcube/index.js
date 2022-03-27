@@ -3,18 +3,17 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 gl = canvas.getContext('webgl');
 
+zz = (x,y) => { x += 1; y+=1; return x+y; }
+_new_buf = (t, a) => {
+  b = gl.createBuffer ();
+  gl.bindBuffer(t, b);
+  gl.bufferData(t, a, gl.STATIC_DRAW);
+  return b;
+}
 
-var vertex_buffer = gl.createBuffer ();
-gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(C_V), gl.STATIC_DRAW);
-
-var color_buffer = gl.createBuffer ();
-gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(C_C), gl.STATIC_DRAW);
-
-var index_buffer = gl.createBuffer ();
-gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
-gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(C_I), gl.STATIC_DRAW);
+var BUF_V = _new_buf(gl.ARRAY_BUFFER, new Float32Array(C_V));
+var BUF_C = _new_buf(gl.ARRAY_BUFFER, new Float32Array(C_C));
+var BUF_I = _new_buf(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(C_I));
 
 var vertCode = 
    'attribute vec3 position;'+
@@ -50,12 +49,12 @@ var _Pmtx = gl.getUniformLocation(shaderprogram, "Pmtx");
 var _Vmtx = gl.getUniformLocation(shaderprogram, "Vmtx");
 var _Mmtx = gl.getUniformLocation(shaderprogram, "Mmtx");
 
-gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+gl.bindBuffer(gl.ARRAY_BUFFER, BUF_V);
 var _position = gl.getAttribLocation(shaderprogram, "position");
 gl.vertexAttribPointer(_position, 3, gl.FLOAT, false,0,0);
 gl.enableVertexAttribArray(_position);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
+gl.bindBuffer(gl.ARRAY_BUFFER, BUF_C);
 var _color = gl.getAttribLocation(shaderprogram, "color");
 gl.vertexAttribPointer(_color, 3, gl.FLOAT, false,0,0) ;
 gl.enableVertexAttribArray(_color);
@@ -96,7 +95,7 @@ var animate = function(time) {
    gl.uniformMatrix4fv(_Vmtx, false, vw_mtx);
    gl.uniformMatrix4fv(_Mmtx, false, mdl_mtx);
 
-   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
+   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, BUF_I);
    gl.drawElements(gl.TRIANGLES, C_I.length, gl.UNSIGNED_SHORT, 0);
 
   THETA += 0.01;
