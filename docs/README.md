@@ -23,3 +23,8 @@ Simplest demo showcasing proof-of-concept.
 
 ![demo-clock](demo-clock/qr.svg)
 
+### [demo-mousetracking](demo-mousetracking/minibundle.html)
+
+Simple demo showcasing mouse tracking
+![demo-mousetracking](demo-mousetracking/qr.svg)
+
