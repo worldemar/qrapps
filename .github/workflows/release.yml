@@ -41,8 +41,7 @@ jobs:
         run: |
           git config --global user.email "woldemar@mimas.ru"
           git config --global user.name "Vladimir Looze"
-          git add bundles
-          git add README.md
+          git add docs
           git commit -m "release new bundles"
           git push origin main
  
