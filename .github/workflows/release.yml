@@ -39,4 +39,5 @@ jobs:
           git config --global user.email "woldemar@mimas.ru"
           git config --global user.name "Vladimir Looze"
           git diff
+          ls -l -R
  
