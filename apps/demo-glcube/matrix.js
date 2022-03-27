@@ -8,8 +8,8 @@ var _m_i = [
    ]
 
 function _m_rotX(a) {
-   let c = Math.cos(a)
-   let s = Math.sin(a)
+   c = Math.cos(a)
+   s = Math.sin(a)
    return [
         1, 0, 0, 0,
         0, c,-s, 0,
@@ -19,8 +19,8 @@ function _m_rotX(a) {
  }
 
 function _m_rotY(a) {
-   let c = Math.cos(a)
-   let s = Math.sin(a)
+   c = Math.cos(a)
+   s = Math.sin(a)
    return [
       c, 0, s, 0,
       0, 1, 0, 0,
@@ -55,23 +55,23 @@ function mult4MV(m, v) {
 }
 
 /* multiply two 4-element matrices */
-function mult4MM(mA, mB) {
+function mult4MM(a, b) {
   return Array().concat(
-    mult4MV(mA, [mB[ 0], mB[ 1], mB[ 2], mB[ 3]]),
-    mult4MV(mA, [mB[ 4], mB[ 5], mB[ 6], mB[ 7]]),
-    mult4MV(mA, [mB[ 8], mB[ 9], mB[10], mB[11]]),
-    mult4MV(mA, [mB[12], mB[13], mB[14], mB[15]])
+    mult4MV(a, [b[ 0], b[ 1], b[ 2], b[ 3]]),
+    mult4MV(a, [b[ 4], b[ 5], b[ 6], b[ 7]]),
+    mult4MV(a, [b[ 8], b[ 9], b[10], b[11]]),
+    mult4MV(a, [b[12], b[13], b[14], b[15]])
   );
 }
 
 /* rotate matrix m by angle a along X */
 function rotateX(m, a) {
-  r = _m_rotX(-a);
+  r = _m_rotX(a);
   return mult4MM(m, r);
 }
 
 /* rotate matrix m by angle a along Y */
 function rotateY(m, a) {
-  r = _m_rotY(-a);
+  r = _m_rotY(a);
   return mult4MM(m, r);
 }

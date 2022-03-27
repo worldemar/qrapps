@@ -18,10 +18,10 @@ gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(C_I), gl.STATIC_DRAW);
 
 var vertCode = 
    'attribute vec3 position;'+
+   'attribute vec3 color;'+
    'uniform mat4 Pmtx;'+
    'uniform mat4 Vmtx;'+
    'uniform mat4 Mmtx;'+
-   'attribute vec3 color;'+
    'varying vec3 vColor;'+
    'void main(void) { '+
       'gl_Position = Pmtx*Vmtx*Mmtx*vec4(position, 1.);'+
@@ -77,55 +77,13 @@ var mdl_mtx = _m_i /* model matrix */
 var vw_mtx = _m_i /* view matrix */
 vw_mtx[14] = -3; /* -5 units back off zero so we can see origin */
 
-
-var AMORTIZATION = 0.95;
-var drag = false;
-var old_x, old_y;
-var dX = 0, dY = 0;
-
-var mouseDown = function(e) {
-   drag = true;
-   old_x = e.pageX, old_y = e.pageY;
-   e.preventDefault();
-   return false;
-};
-
-var mouseUp = function(e){
-   drag = false;
-};
-
-var mouseMove = function(e) {
-   if (!drag) return false;
-   dX = (e.pageX-old_x)*2*Math.PI/canvas.width,
-   dY = (e.pageY-old_y)*2*Math.PI/canvas.height;
-   THETA+= dX;
-   PHI+=dY;
-   old_x = e.pageX, old_y = e.pageY;
-   e.preventDefault();
-};
-
-canvas.addEventListener("mousedown", mouseDown, false);
-canvas.addEventListener("mouseup", mouseUp, false);
-canvas.addEventListener("mouseout", mouseUp, false);
-canvas.addEventListener("mousemove", mouseMove, false);
-
-/*=================== Drawing =================== */
-
-var THETA = 0.5, PHI = 0.7;
-var time_old = 0;
+var THETA = 0;
 
 var animate = function(time) {
-   var dt = time-time_old;
-
-   if (!drag) {
-      dX *= AMORTIZATION, dY*=AMORTIZATION;
-      THETA+=dX, PHI+=dY;
-   }
-
   mdl_mtx = _m_i /* model matrix */
 
   mdl_mtx = rotateY(mdl_mtx, THETA);
-  mdl_mtx = rotateX(mdl_mtx, PHI);
+  mdl_mtx = rotateX(mdl_mtx, -THETA);
 
    time_old = time; 
    gl.enable(gl.DEPTH_TEST);
@@ -140,6 +98,8 @@ var animate = function(time) {
 
    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
    gl.drawElements(gl.TRIANGLES, C_I.length, gl.UNSIGNED_SHORT, 0);
+
+  THETA += 0.01;
 
    requestAnimationFrame(animate);
 }
