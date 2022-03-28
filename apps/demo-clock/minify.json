@@ -1,4 +1,6 @@
 {
     "collapseWhitespace": true,
-    "minifyJS": true
+    "minifyJS": true,
+    "minifyCSS": true,
+    "removeOptionalTags": true
 }

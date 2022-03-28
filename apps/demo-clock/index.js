@@ -1,15 +1,8 @@
-function dt() {
-  const n = new Date();
-  let h = lz(n.getHours());
-  let m = lz(n.getMinutes());
-  let s = lz(n.getSeconds());
-  document.getElementById('d').innerHTML =  h + " : " + m + " : " + s;
-  setTimeout(dt, 1000);
+var queue_next_update = () => setTimeout(display_time, 1000);
+
+var display_time = () => {
+  document.getElementById('d').innerHTML = new Date().toLocaleString();
+  queue_next_update();
 };
 
-function lz(i) {
-  if (i < 10) { i = "0" + i; }; 
-  return i;
-};
-
-setTimeout(dt, 1000);
+queue_next_update();
