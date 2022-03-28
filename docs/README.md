@@ -24,19 +24,19 @@ Each app is HTML/JS/CSS webpage contained within own directory in `apps`. Script
 
 ## Collection of QR apps!
 Generated automatically on push and published to https://worldemar.github.io/qrapps/
-### [demo-canvas](demo-canvas/minibundle.html)
+### [demo-canvas](demo-canvas/index.html)
 
 Simple demo showcasing mouse tracking and canvas drawing
 
 ![demo-canvas](demo-canvas/qr.svg)
 
-### [demo-clock](demo-clock/minibundle.html)
+### [demo-clock](demo-clock/index.html)
 
 Simplest demo showcasing proof-of-concept.
 
 ![demo-clock](demo-clock/qr.svg)
 
-### [demo-glcube](demo-glcube/minibundle.html)
+### [demo-glcube](demo-glcube/index.html)
 
 Simple demo showcasing rotating cube using WebGL.
 Uses internal 600-character matrix library and no engine.
