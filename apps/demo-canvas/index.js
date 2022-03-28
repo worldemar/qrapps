@@ -1,33 +1,35 @@
-var MX = 0, MY = 0, CX = 0, CY = 0, BDY, CNVS, CTX;
+var mouse_x = 0, mouse_y = 0;
+var circle_x = 0, circle_y = 0;
+var body, canvas, ctx;
 
-function init() {
-  BDY = document.getElementsByTagName('body')[0]
-  CNVS = document.getElementsByTagName('canvas')[0]
-  CNVS.width = window.innerWidth;
-  CNVS.height = window.innerHeight;
-  CTX = CNVS.getContext('2d');
-  BDY.addEventListener( 'mousemove', function(e) {
-    bounds = BDY.getBoundingClientRect();
-    MX = e.clientX - bounds.left;
-    MY = e.clientY - bounds.top;
+var init = () => {
+  body = document.getElementsByTagName('body')[0]
+  canvas = document.getElementsByTagName('canvas')[0]
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  ctx = canvas.getContext('2d');
+  body.addEventListener( 'mousemove', function(e) {
+    bounds = body.getBoundingClientRect();
+    mouse_x = e.clientX - bounds.left;
+    mouse_y = e.clientY - bounds.top;
   });
 }
 
-function step() {
-  CTX.fillStyle = 'rgba(0,0,0,0.1)';
-  CTX.fillRect(0, 0, CNVS.width, CNVS.height);
+var step = () => {
+  ctx.fillStyle = 'rgba(0,0,0,0.1)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   for(var i = 0; i < 10; i++) {
-    let dx = MX - CX;
-    let dy = MY - CY;
-    let dst = Math.sqrt(dx * dx + dy * dy);
-    CX = CX + dx / (dst + 1);
-    CY = CY + dy / (dst + 1);
+    var dx = (mouse_x - circle_x);
+    var dy = mouse_y - circle_y;
+    var dst = Math.sqrt(dx * dx + dy * dy);
+    circle_x = circle_x + dx / (dst + 1);
+    circle_y = circle_y + dy / (dst + 1);
 
-    CTX.fillStyle = 'white';
-    CTX.beginPath();
-    CTX.arc(CX, CY, 8, 0, 2 * Math.PI);
-    CTX.fill();
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(circle_x, circle_y, 8, 0, 2 * Math.PI);
+    ctx.fill();
   }
 
   requestAnimationFrame(step);
