@@ -7,7 +7,7 @@ All apps follow same rules:
 - **Fit within single QR code**. Any tricks are okay as long as QR code is scannable.
 - **Do not require any external resources**. Apps are fully operable if scanned from paper ("hard copy") without internet connection on scanning device.
 
-## Who to use?
+## How to use?
 These codes can be scanned by your device of choice and content pasted directly into browser URL.
 Since QR code content is [Data URL](https://en.wikipedia.org/wiki/Data_URI_scheme), it contains everything needed within itself.
 
