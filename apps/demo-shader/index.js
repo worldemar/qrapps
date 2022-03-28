@@ -40,33 +40,33 @@ void main() {
 `
 
 function createShader(str, type) {
-	var shader = gl.createShader(type);
-	gl.shaderSource(shader, str);
-	gl.compileShader(shader);
-	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-		throw gl.getShaderInfoLog(shader);
+	var shader = webgl.createShader(type);
+	webgl.shaderSource(shader, str);
+	webgl.compileShader(shader);
+	if (!webgl.getShaderParameter(shader, webgl.COMPILE_STATUS)) {
+		throw webgl.getShaderInfoLog(shader);
 	}
 	return shader;
 }
 
 function createProgram(vstr, fstr) {
-	var program = gl.createProgram();
-	var vshader = createShader(vstr, gl.VERTEX_SHADER);
-	var fshader = createShader(fstr, gl.FRAGMENT_SHADER);
-	gl.attachShader(program, vshader);
-	gl.attachShader(program, fshader);
-	gl.linkProgram(program);
-	if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-		throw gl.getProgramInfoLog(program);
+	var program = webgl.createProgram();
+	var vshader = createShader(vstr, webgl.VERTEX_SHADER);
+	var fshader = createShader(fstr, webgl.FRAGMENT_SHADER);
+	webgl.attachShader(program, vshader);
+	webgl.attachShader(program, fshader);
+	webgl.linkProgram(program);
+	if (!webgl.getProgramParameter(program, webgl.LINK_STATUS)) {
+		throw webgl.getProgramInfoLog(program);
 	}
 	return program;
 }
 
 function screenQuad() {
-	var vertexPosBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertexPosBuffer);
+	var vertexPosBuffer = webgl.createBuffer();
+	webgl.bindBuffer(webgl.ARRAY_BUFFER, vertexPosBuffer);
 	var vertices = [-1, -1, 1, -1, -1, 1, 1, 1];
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+	webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array(vertices), webgl.STATIC_DRAW);
 	vertexPosBuffer.itemSize = 2;
 	vertexPosBuffer.numItems = 4;
 
@@ -81,13 +81,13 @@ function screenQuad() {
 }
 
 function linkProgram(program) {
-	var vshader = createShader(program.vshaderSource, gl.VERTEX_SHADER);
-	var fshader = createShader(program.fshaderSource, gl.FRAGMENT_SHADER);
-	gl.attachShader(program, vshader);
-	gl.attachShader(program, fshader);
-	gl.linkProgram(program);
-	if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-		throw gl.getProgramInfoLog(program);
+	var vshader = createShader(program.vshaderSource, webgl.VERTEX_SHADER);
+	var fshader = createShader(program.fshaderSource, webgl.FRAGMENT_SHADER);
+	webgl.attachShader(program, vshader);
+	webgl.attachShader(program, fshader);
+	webgl.linkProgram(program);
+	if (!webgl.getProgramParameter(program, webgl.LINK_STATUS)) {
+		throw webgl.getProgramInfoLog(program);
 	}
 }
 
@@ -117,7 +117,7 @@ function loadFile(file, callback, noCache, isJson) {
 }
 
 function loadProgram(vs, fs, callback) {
-	var program = gl.createProgram();
+	var program = webgl.createProgram();
 	function vshaderLoaded(str) {
 		program.vshaderSource = str;
 		if (program.fshaderSource) {
@@ -137,63 +137,56 @@ function loadProgram(vs, fs, callback) {
 	return program;
 }
 
-var c = document.getElementById('c');
-var gl = c.getContext('webgl');
-var offset = [-0.5, 0];
-var scale = 1.35;
-var actions = {};
-var keyMappings = { 
-    '37' : 'panleft',
-    '38' : 'panup',
-    '39' : 'panright',
-    '40' : 'pandown',
-    '90' : 'zoomin',
-    '88' : 'zoomout'
-  };
-for (var k in keyMappings) {
-  actions[keyMappings[k]] = false;
-}
-var vertexPosBuffer = screenQuad();
+var canvas = document.getElementById('c');
+var webgl = canvas.getContext('webgl');
+var current_center_x = -0.5;
+var current_center_y = 0;
+var current_zoom = 1.35;
+var target_center_x = -0.5;
+var target_center_y = 0;
+var target_zoom = 1.35;
 
+
+
+var vertexPosBuffer = screenQuad();
 var program = createProgram(shader_v,shader_f);
-gl.useProgram(program);
-program.vertexPosAttrib = gl.getAttribLocation(program, 'pos');
-program.cs = gl.getUniformLocation(program, 'cs');
-program.o = gl.getUniformLocation(program, 'o');
-program.s = gl.getUniformLocation(program, 's');
-gl.enableVertexAttribArray(program.vertexPosAttrib);
-gl.vertexAttribPointer(program.vertexPosAttrib, vertexPosBuffer.itemSize, gl.FLOAT, false, 0, 0);
+webgl.useProgram(program);
+program.vertexPosAttrib = webgl.getAttribLocation(program, 'pos');
+program.cs = webgl.getUniformLocation(program, 'cs');
+program.o = webgl.getUniformLocation(program, 'o');
+program.s = webgl.getUniformLocation(program, 's');
+webgl.enableVertexAttribArray(program.vertexPosAttrib);
+webgl.vertexAttribPointer(program.vertexPosAttrib, vertexPosBuffer.itemSize, webgl.FLOAT, false, 0, 0);
 
 window.onkeydown = function(e) {
   var kc = e.keyCode.toString();
-  if (keyMappings.hasOwnProperty(kc)) {
-    actions[keyMappings[kc]] = true;
-      requestAnimationFrame(draw)
-  }
+  // 37 = cursor left
+  // 39 = cursor right
+  target_center_x += 0.1*current_zoom*((kc=='39') - (kc=='37'));
+  // 38 = cursor up
+  // 40 = cursor up
+  target_center_y += 0.1*current_zoom*((kc=='38') - (kc=='40'));
+  // 107 = +
+  // 109 = -
+  target_zoom *= 1 + 0.1*((kc=='109') - (kc=='107'))
+  requestAnimationFrame(draw)
 };
 
-window.onkeyup = function(e) {
-  var kc = e.keyCode.toString();
-  if (keyMappings.hasOwnProperty(kc)) {
-    actions[keyMappings[kc]] = false;
-  }
-  for (var j in keyMappings) {
-    if (actions[keyMappings[j]]) {
-      return;
-    }
-  }
-};
+not_eqal = (a, b) => (Math.abs(a-b) > 0.001)
 
 function draw() {
-  offset[0] += -(actions.panleft ? scale / 25 : 0) + (actions.panright ? scale / 25 : 0);
-  offset[1] += -(actions.pandown ? scale / 25 : 0) + (actions.panup ? scale / 25 : 0);
-  scale = scale * (actions.zoomin ? 0.975 : 1.0) / (actions.zoomout ? 0.975 : 1.0);
-  gl.uniform2f(program.cs, c.width, c.height);
-  gl.uniform2f(program.o, offset[0], offset[1]);
-  gl.uniform1f(program.s, scale);
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, vertexPosBuffer.numItems);
-  for (var k in keyMappings) {
-    actions[keyMappings[k]] = false;
+  webgl.uniform2f(program.cs, canvas.width, canvas.height);
+  webgl.uniform2f(program.o, current_center_x, current_center_y);
+  webgl.uniform1f(program.s, current_zoom);
+  webgl.drawArrays(webgl.TRIANGLE_STRIP, 0, vertexPosBuffer.numItems);
+
+  if (not_eqal(current_center_x, target_center_x) || 
+      not_eqal(current_center_y, target_center_y) || 
+      not_eqal(current_zoom, target_zoom)) {
+    current_center_x += (target_center_x - current_center_x) * .1;
+    current_center_y += (target_center_y - current_center_y) * .1;
+    current_zoom += (target_zoom - current_zoom) * .1;
+    requestAnimationFrame(draw)    
   }
 }
 
