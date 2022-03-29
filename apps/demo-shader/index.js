@@ -8,7 +8,7 @@ var shader_f = `
 precision highp float;
 precision mediump int;
 uniform vec2 cs;
-uniform vec2 o;
+uniform vec2 c;
 uniform float s;
 
 vec4 calc(vec2 texCoord) {
@@ -34,111 +34,47 @@ vec4 calc(vec2 texCoord) {
 
 void main() {
   vec2 texCoord = (gl_FragCoord.xy / cs.xy) * 2.0 - vec2(1.0,1.0);
-  texCoord = texCoord * s + o;
+  texCoord = texCoord * s + c;
   gl_FragColor = calc(texCoord);
 }
 `
 
 function createShader(str, type) {
-	var shader = webgl.createShader(type);
-	webgl.shaderSource(shader, str);
-	webgl.compileShader(shader);
-	if (!webgl.getShaderParameter(shader, webgl.COMPILE_STATUS)) {
-		throw webgl.getShaderInfoLog(shader);
+	var shader = WEBGL.createShader(type);
+	WEBGL.shaderSource(shader, str);
+	WEBGL.compileShader(shader);
+	if (!WEBGL.getShaderParameter(shader, WEBGL.COMPILE_STATUS)) {
+		throw WEBGL.getShaderInfoLog(shader);
 	}
 	return shader;
 }
 
 function createProgram(vstr, fstr) {
-	var program = webgl.createProgram();
-	var vshader = createShader(vstr, webgl.VERTEX_SHADER);
-	var fshader = createShader(fstr, webgl.FRAGMENT_SHADER);
-	webgl.attachShader(program, vshader);
-	webgl.attachShader(program, fshader);
-	webgl.linkProgram(program);
-	if (!webgl.getProgramParameter(program, webgl.LINK_STATUS)) {
-		throw webgl.getProgramInfoLog(program);
+	var program = WEBGL.createProgram();
+	var vshader = createShader(vstr, WEBGL.VERTEX_SHADER);
+	var fshader = createShader(fstr, WEBGL.FRAGMENT_SHADER);
+	WEBGL.attachShader(program, vshader);
+	WEBGL.attachShader(program, fshader);
+	WEBGL.linkProgram(program);
+	if (!WEBGL.getProgramParameter(program, WEBGL.LINK_STATUS)) {
+		throw WEBGL.getProgramInfoLog(program);
 	}
 	return program;
-}
-
-function screenQuad() {
-	var vertexPosBuffer = webgl.createBuffer();
-	webgl.bindBuffer(webgl.ARRAY_BUFFER, vertexPosBuffer);
-	var vertices = [-1, -1, 1, -1, -1, 1, 1, 1];
-	webgl.bufferData(webgl.ARRAY_BUFFER, new Float32Array(vertices), webgl.STATIC_DRAW);
-	vertexPosBuffer.itemSize = 2;
-	vertexPosBuffer.numItems = 4;
-
-	/*
-	 2___3
-	 |\  |
-	 | \ |
-	 |__\|
-	 0   1
-	*/
-	return vertexPosBuffer;
 }
 
 function linkProgram(program) {
-	var vshader = createShader(program.vshaderSource, webgl.VERTEX_SHADER);
-	var fshader = createShader(program.fshaderSource, webgl.FRAGMENT_SHADER);
-	webgl.attachShader(program, vshader);
-	webgl.attachShader(program, fshader);
-	webgl.linkProgram(program);
-	if (!webgl.getProgramParameter(program, webgl.LINK_STATUS)) {
-		throw webgl.getProgramInfoLog(program);
+	var vshader = createShader(program.vshaderSource, WEBGL.VERTEX_SHADER);
+	var fshader = createShader(program.fshaderSource, WEBGL.FRAGMENT_SHADER);
+	WEBGL.attachShader(program, vshader);
+	WEBGL.attachShader(program, fshader);
+	WEBGL.linkProgram(program);
+	if (!WEBGL.getProgramParameter(program, WEBGL.LINK_STATUS)) {
+		throw WEBGL.getProgramInfoLog(program);
 	}
-}
-
-function loadFile(file, callback, noCache, isJson) {
-	var request = new XMLHttpRequest();
-	request.onreadystatechange = function() {
-		if (request.readyState == 1) {
-			if (isJson) {
-				request.overrideMimeType('application/json');
-			}
-			request.send();
-		} else if (request.readyState == 4) {
-			if (request.status == 200) {
-				callback(request.responseText);
-			} else if (request.status == 404) {
-				throw 'File "' + file + '" does not exist.';
-			} else {
-				throw 'XHR error ' + request.status + '.';
-			}
-		}
-	};
-	var url = file;
-	if (noCache) {
-		url += '?' + (new Date()).getTime();
-	}
-	request.open('GET', url, true);
-}
-
-function loadProgram(vs, fs, callback) {
-	var program = webgl.createProgram();
-	function vshaderLoaded(str) {
-		program.vshaderSource = str;
-		if (program.fshaderSource) {
-			linkProgram(program);
-			callback(program);
-		}
-	}
-	function fshaderLoaded(str) {
-		program.fshaderSource = str;
-		if (program.vshaderSource) {
-			linkProgram(program);
-			callback(program);
-		}
-	}
-	loadFile(vs, vshaderLoaded, true);
-	loadFile(fs, fshaderLoaded, true);
-	return program;
 }
 
 var canvas = document.getElementById('c');
-var webgl = canvas.getContext('webgl');
+var WEBGL = canvas.getContext('webgl');
 var current_center_x = -0.5;
 var current_center_y = 0;
 var current_zoom = 1.35;
@@ -147,38 +83,41 @@ var target_center_y = 0;
 var target_zoom = 1.35;
 
 
+var vertexPosBuffer = WEBGL.createBuffer();
+WEBGL.bindBuffer(WEBGL.ARRAY_BUFFER, vertexPosBuffer);
+WEBGL.bufferData(WEBGL.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), WEBGL.STATIC_DRAW);
 
-var vertexPosBuffer = screenQuad();
 var program = createProgram(shader_v,shader_f);
-webgl.useProgram(program);
-program.vertexPosAttrib = webgl.getAttribLocation(program, 'pos');
-program.cs = webgl.getUniformLocation(program, 'cs');
-program.o = webgl.getUniformLocation(program, 'o');
-program.s = webgl.getUniformLocation(program, 's');
-webgl.enableVertexAttribArray(program.vertexPosAttrib);
-webgl.vertexAttribPointer(program.vertexPosAttrib, vertexPosBuffer.itemSize, webgl.FLOAT, false, 0, 0);
+WEBGL.useProgram(program);
+var param_position = WEBGL.getAttribLocation(program, 'pos');
+var param_canvas_size = WEBGL.getUniformLocation(program, 'cs');
+var param_center = WEBGL.getUniformLocation(program, 'c');
+var param_Scale = WEBGL.getUniformLocation(program, 's');
+
+WEBGL.enableVertexAttribArray(param_position);
+WEBGL.vertexAttribPointer(param_position, 2, WEBGL.FLOAT, false, 0, 0);
 
 window.onkeydown = function(e) {
-  var kc = e.keyCode.toString();
+  var kc = e.keyCode;
   // 37 = cursor left
   // 39 = cursor right
-  target_center_x += 0.1*current_zoom*((kc=='39') - (kc=='37'));
+  target_center_x += 0.1*current_zoom*((kc==39) - (kc==37));
   // 38 = cursor up
   // 40 = cursor up
-  target_center_y += 0.1*current_zoom*((kc=='38') - (kc=='40'));
+  target_center_y += 0.1*current_zoom*((kc==38) - (kc==40));
   // 107 = +
   // 109 = -
-  target_zoom *= 1 + 0.1*((kc=='109') - (kc=='107'))
+  target_zoom *= 1 + 0.1*((kc==109) - (kc==107))
   requestAnimationFrame(draw)
 };
 
-not_eqal = (a, b) => (Math.abs(a-b) > 0.001)
 
 function draw() {
-  webgl.uniform2f(program.cs, canvas.width, canvas.height);
-  webgl.uniform2f(program.o, current_center_x, current_center_y);
-  webgl.uniform1f(program.s, current_zoom);
-  webgl.drawArrays(webgl.TRIANGLE_STRIP, 0, vertexPosBuffer.numItems);
+  var not_eqal = (a, b) => (Math.abs(a-b) > 0.001);
+  WEBGL.uniform2f(param_canvas_size, canvas.width, canvas.height);
+  WEBGL.uniform2f(param_center, current_center_x, current_center_y);
+  WEBGL.uniform1f(param_Scale, current_zoom);
+  WEBGL.drawArrays(WEBGL.TRIANGLE_STRIP, 0, 4);
 
   if (not_eqal(current_center_x, target_center_x) || 
       not_eqal(current_center_y, target_center_y) || 
