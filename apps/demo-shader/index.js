@@ -43,7 +43,7 @@ void main() {
 var request_animation_frame = () => { requestAnimationFrame(refresh_canvas); };
 var not_eqal = (a, b) => (Math.abs(a-b) > 0.001);
 var webgl_get_uniform_location = (program, param_name) => {
-  return WEBGL.getAttribLocation(program, param_name);
+  return WEBGL.getUniformLocation(program, param_name);
 };
 var attach_shader_to_webgl = (program, shader_source, shader_tupe) => {
 	var shader = WEBGL.createShader(shader_tupe);
@@ -72,7 +72,7 @@ attach_shader_to_webgl(program, vertex_shader_code, WEBGL.VERTEX_SHADER);
 attach_shader_to_webgl(program, fragment_shader_code, WEBGL.FRAGMENT_SHADER);
 WEBGL.linkProgram(program);
 WEBGL.useProgram(program);
-var param_position = webgl_get_uniform_location(program, 'pos');
+var param_position = WEBGL.getAttribLocation(program, 'pos');
 var param_canvas_size = webgl_get_uniform_location(program, 'cs');
 var param_center = webgl_get_uniform_location(program, 'c');
 var param_scale = webgl_get_uniform_location(program, 's');
