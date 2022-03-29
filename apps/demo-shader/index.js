@@ -1,42 +1,38 @@
-var vertex_shader_code = `
-attribute vec2 pos;
-void main() {
-  gl_Position = vec4(pos, 0, 1);
-}
-`
+// Vertex shader is completely unrelated in this demo,
+// so I decided to squeeze it to single line
+var vertex_shader_code = 'attribute vec2 pos;void main(){gl_Position=vec4(pos,0,1);}'
 var fragment_shader_code = `
 precision highp float;
-precision mediump int;
-uniform vec2 cs;
-uniform vec2 c;
+uniform vec2 cs,c;
 uniform float s;
 
-vec4 calc(vec2 texCoord) {
-  float x = 0.0;
-  float y = 0.0;
-  float v = 10000.0;
-  float j = 10000.0;
-  for (int iteration = 0; iteration < 100; ++iteration) {
-    float xtemp = x*x-y*y+texCoord.x;
-    y = 2.0*x*y+texCoord.y;
-    x = xtemp;
-    v = min(v, abs(x*x+y*y));
-    j = min(j, abs(x*y));
-    if (x*x+y*y >= 8.0) {
-      float d = (float(iteration) - (log(log(sqrt(x*x+y*y))) / log(2.0))) / 50.0;
-      v = (1.0 - v) / 2.0;
-      j = (1.0 - j) / 2.0;
+vec4 calc(vec2 tex){
+  float x=.0,y=.0;
+  float v=1e5,j=1e5;
+  for(int iter=0;iter<100;++iter){
+    float _x=x*x-y*y+tex.x;
+    y=2.0*x*y+tex.y;
+    x=_x;
+    v=min(v,abs(x*x+y*y));
+    j=min(j,abs(x*y));
+    if (x*x+y*y>=8.0) {
+      float d=(float(iter)-(log(log(sqrt(x*x+y*y)))/log(2.0)))/50.0;
+      v=(1.0-v)/2.0;
+      j=(1.0-j)/2.0;
       return vec4(d+j,d,d+v,1);
     }
   }
-  return vec4(0,0,0,1);
+  float d=v*v+j*j;
+  v=-2.0/log(v);
+  j=-2.0/log(j);
+  return vec4(1.0-d-v*j,d,1.0/v*j,1);
 }
 
-void main() {
-  vec2 texCoord = (gl_FragCoord.xy / cs.xy) * 2.0 - vec2(1.0,1.0);
-  texCoord = texCoord * s + c;
-  texCoord.x = texCoord.x * cs.x / cs.y;
-  gl_FragColor = calc(texCoord);
+void main(){
+  vec2 tex=(gl_FragCoord.xy/cs.xy)*2.0-vec2(1.0,1.0);
+  tex=tex*s+c;
+  tex.x=tex.x*cs.x/cs.y;
+  gl_FragColor=calc(tex);
 }
 `
 // Shortcuts to save javascript size.
@@ -99,7 +95,7 @@ window.onkeydown = function(event) {
   request_animation_frame();
 };
 
-var floats_not_equal = (a, b) => (Math.abs(a-b) > 0.001);
+var floats_not_equal = (a, b) => (Math.abs(a-b) > 0.000001);
 var refresh_canvas = () => {
   // as wordy as this looks - converting it to function won't save space
   WEBGL.uniform2f(param_canvas_size, CANVAS_WIDTH, CANVAS_HEIGHT);
