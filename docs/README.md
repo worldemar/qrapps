@@ -47,3 +47,9 @@ or more agressive minifying/uglifying
 
 ### [demo-shader](demo-shader/index.html)
 
+Simple demo showcasing fragment shader using WebGL.
+Contains minimal (about 50 lines, just over 1kb compressed) of boilerplate code to run single fragment shader.
+Mandelbrot set shader added for demonstration purposes based on [WebGL101](https://github.com/emoller/WebGL101) fragment shader sample.
+
+![demo-shader](demo-shader/qr.svg)
+
