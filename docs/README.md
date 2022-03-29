@@ -19,6 +19,8 @@ Since QR code content is [Data URL](https://en.wikipedia.org/wiki/Data_URI_schem
 For fun, challenge and as a demonstration of modern browser capabilities.
 Fitting entire app in one QR code also keeps them relatively small and simple... until author tries to squeeze code too hard and it becomes unreadeable 😂
 
+This is also a good source of compact code examples. Some of them were inspired by examples I had found, but stripped down from all the fluff and simplified. Instead of including some 10kb+ libraries and then having 3-line example, these are within 200 lines of code and nothing is hidden from you.
+
 ## How does it work?
 Each app is HTML/JS/CSS webpage contained within own directory in `apps`. Scripts `qr.py` and `qrs.py` will convert each app into [QR code](https://en.wikipedia.org/wiki/QR_code) by 'minifying'/'uglyfying' it and inlining all JS/CSS/whatever into single HTML. This HTML then encoded as [Data URL](https://en.wikipedia.org/wiki/Data_URI_scheme) and QR code of said URL is generated.
 
@@ -49,7 +51,7 @@ or more agressive minifying/uglifying
 
 Simple demo showcasing fragment shader using WebGL.
 Contains minimal (about 50 lines, just over 1kb compressed) of boilerplate code to run single fragment shader.
-Mandelbrot set shader added for demonstration purposes based on [WebGL101](https://github.com/emoller/WebGL101) fragment shader sample.
+Mandelbrot set shader added for demonstration purposes based on [WebGL101](https://github.com/emoller/WebGL101) fragment shader example. Controls are cursor keys, `+` and `-`.
 
 ![demo-shader](demo-shader/qr.svg)
 
