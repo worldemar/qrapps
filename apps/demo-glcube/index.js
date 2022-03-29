@@ -129,9 +129,9 @@ var shader_param_matrix = GL_CTX.getUniformLocation(shader_program, "m");
 
 var _bind_buffer = (buffer, variable_name) => {
   GL_CTX.bindBuffer(GL_CTX.ARRAY_BUFFER, buffer);
-  _z = GL_CTX.getAttribLocation(shader_program, variable_name);
-  GL_CTX.vertexAttribPointer(_z, 3, GL_CTX.FLOAT, false, 0, 0);
-  GL_CTX.enableVertexAttribArray(_z);
+  var variable = GL_CTX.getAttribLocation(shader_program, variable_name);
+  GL_CTX.vertexAttribPointer(variable, 3, GL_CTX.FLOAT, false, 0, 0);
+  GL_CTX.enableVertexAttribArray(variable);
 }
 _bind_buffer(BUF_V, "p");
 _bind_buffer(BUF_C, "c");
