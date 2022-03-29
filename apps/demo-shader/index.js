@@ -30,8 +30,8 @@ vec4 calc(vec2 tex){
 
 void main(){
   vec2 tex=(gl_FragCoord.xy/cs.xy)*2.0-vec2(1.0,1.0);
-  tex=tex*s+c;
   tex.x=tex.x*cs.x/cs.y;
+  tex=tex*s+c;
   gl_FragColor=calc(tex);
 }
 `
