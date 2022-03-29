@@ -1,10 +1,10 @@
-var shader_v = `
+var vertex_shader_code = `
 attribute vec2 pos;
 void main() {
   gl_Position = vec4(pos, 0, 1);
 }
 `
-var shader_f = `
+var fragment_shader_code = `
 precision highp float;
 precision mediump int;
 uniform vec2 cs;
@@ -38,40 +38,20 @@ void main() {
   gl_FragColor = calc(texCoord);
 }
 `
-
-function createShader(str, type) {
-	var shader = WEBGL.createShader(type);
-	WEBGL.shaderSource(shader, str);
+// Shortcuts to save javascript size.
+// These contain function names that are too long.
+var request_animation_frame = () => { requestAnimationFrame(refresh_canvas); };
+var not_eqal = (a, b) => (Math.abs(a-b) > 0.001);
+var webgl_get_uniform_location = (program, param_name) => {
+  return WEBGL.getAttribLocation(program, param_name);
+};
+var attach_shader_to_webgl = (program, shader_source, shader_tupe) => {
+	var shader = WEBGL.createShader(shader_tupe);
+	WEBGL.shaderSource(shader, shader_source);
 	WEBGL.compileShader(shader);
-	if (!WEBGL.getShaderParameter(shader, WEBGL.COMPILE_STATUS)) {
-		throw WEBGL.getShaderInfoLog(shader);
-	}
+  WEBGL.attachShader(program, shader);
 	return shader;
-}
-
-function createProgram(vstr, fstr) {
-	var program = WEBGL.createProgram();
-	var vshader = createShader(vstr, WEBGL.VERTEX_SHADER);
-	var fshader = createShader(fstr, WEBGL.FRAGMENT_SHADER);
-	WEBGL.attachShader(program, vshader);
-	WEBGL.attachShader(program, fshader);
-	WEBGL.linkProgram(program);
-	if (!WEBGL.getProgramParameter(program, WEBGL.LINK_STATUS)) {
-		throw WEBGL.getProgramInfoLog(program);
-	}
-	return program;
-}
-
-function linkProgram(program) {
-	var vshader = createShader(program.vshaderSource, WEBGL.VERTEX_SHADER);
-	var fshader = createShader(program.fshaderSource, WEBGL.FRAGMENT_SHADER);
-	WEBGL.attachShader(program, vshader);
-	WEBGL.attachShader(program, fshader);
-	WEBGL.linkProgram(program);
-	if (!WEBGL.getProgramParameter(program, WEBGL.LINK_STATUS)) {
-		throw WEBGL.getProgramInfoLog(program);
-	}
-}
+};
 
 var canvas = document.getElementById('c');
 var WEBGL = canvas.getContext('webgl');
@@ -81,42 +61,42 @@ var current_zoom = 1.35;
 var target_center_x = -0.5;
 var target_center_y = 0;
 var target_zoom = 1.35;
-
+var param_position;
 
 var vertexPosBuffer = WEBGL.createBuffer();
 WEBGL.bindBuffer(WEBGL.ARRAY_BUFFER, vertexPosBuffer);
 WEBGL.bufferData(WEBGL.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), WEBGL.STATIC_DRAW);
 
-var program = createProgram(shader_v,shader_f);
+var program = WEBGL.createProgram();
+attach_shader_to_webgl(program, vertex_shader_code, WEBGL.VERTEX_SHADER);
+attach_shader_to_webgl(program, fragment_shader_code, WEBGL.FRAGMENT_SHADER);
+WEBGL.linkProgram(program);
 WEBGL.useProgram(program);
-var param_position = WEBGL.getAttribLocation(program, 'pos');
-var param_canvas_size = WEBGL.getUniformLocation(program, 'cs');
-var param_center = WEBGL.getUniformLocation(program, 'c');
-var param_Scale = WEBGL.getUniformLocation(program, 's');
-
+var param_position = webgl_get_uniform_location(program, 'pos');
+var param_canvas_size = webgl_get_uniform_location(program, 'cs');
+var param_center = webgl_get_uniform_location(program, 'c');
+var param_scale = webgl_get_uniform_location(program, 's');
 WEBGL.enableVertexAttribArray(param_position);
 WEBGL.vertexAttribPointer(param_position, 2, WEBGL.FLOAT, false, 0, 0);
 
-window.onkeydown = function(e) {
-  var kc = e.keyCode;
+window.onkeydown = function(event) {
+  var key_code = event.keyCode;
   // 37 = cursor left
   // 39 = cursor right
-  target_center_x += 0.1*current_zoom*((kc==39) - (kc==37));
+  target_center_x += 0.1*current_zoom*((key_code==39) - (key_code==37));
   // 38 = cursor up
   // 40 = cursor up
-  target_center_y += 0.1*current_zoom*((kc==38) - (kc==40));
+  target_center_y += 0.1*current_zoom*((key_code==38) - (key_code==40));
   // 107 = +
   // 109 = -
-  target_zoom *= 1 + 0.1*((kc==109) - (kc==107))
-  requestAnimationFrame(draw)
+  target_zoom *= 1 + 0.1*((key_code==109) - (key_code==107));
+  request_animation_frame();
 };
 
-
-function draw() {
-  var not_eqal = (a, b) => (Math.abs(a-b) > 0.001);
+var refresh_canvas = () => {
   WEBGL.uniform2f(param_canvas_size, canvas.width, canvas.height);
   WEBGL.uniform2f(param_center, current_center_x, current_center_y);
-  WEBGL.uniform1f(param_Scale, current_zoom);
+  WEBGL.uniform1f(param_scale, current_zoom);
   WEBGL.drawArrays(WEBGL.TRIANGLE_STRIP, 0, 4);
 
   if (not_eqal(current_center_x, target_center_x) || 
@@ -125,9 +105,7 @@ function draw() {
     current_center_x += (target_center_x - current_center_x) * .1;
     current_center_y += (target_center_y - current_center_y) * .1;
     current_zoom += (target_zoom - current_zoom) * .1;
-    requestAnimationFrame(draw)    
+    request_animation_frame();
   }
 }
-
-requestAnimationFrame(draw)
-draw();
+request_animation_frame();
