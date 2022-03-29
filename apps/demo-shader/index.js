@@ -35,6 +35,7 @@ vec4 calc(vec2 texCoord) {
 void main() {
   vec2 texCoord = (gl_FragCoord.xy / cs.xy) * 2.0 - vec2(1.0,1.0);
   texCoord = texCoord * s + c;
+  texCoord.x = texCoord.x * cs.x / cs.y;
   gl_FragColor = calc(texCoord);
 }
 `
@@ -55,15 +56,18 @@ var attach_shader_to_webgl = (program, shader_source, shader_tupe) => {
 
 var canvas = document.getElementById('c');
 var WEBGL = canvas.getContext('webgl');
+var CANVAS_WIDTH = canvas.width = window.innerWidth;
+var CANVAS_HEIGHT = canvas.height = window.innerHeight;
 var current_center_x = -0.5;
 var current_center_y = 0;
-var current_zoom = 1.35;
+var current_zoom = 3.;
 var target_center_x = -0.5;
 var target_center_y = 0;
-var target_zoom = 1.35;
+var target_zoom = 1.;
 var param_position;
 
 var vertexPosBuffer = WEBGL.createBuffer();
+WEBGL.viewport(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 WEBGL.bindBuffer(WEBGL.ARRAY_BUFFER, vertexPosBuffer);
 WEBGL.bufferData(WEBGL.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), WEBGL.STATIC_DRAW);
 
@@ -94,7 +98,7 @@ window.onkeydown = function(event) {
 };
 
 var refresh_canvas = () => {
-  WEBGL.uniform2f(param_canvas_size, canvas.width, canvas.height);
+  WEBGL.uniform2f(param_canvas_size, CANVAS_WIDTH, CANVAS_HEIGHT);
   WEBGL.uniform2f(param_center, current_center_x, current_center_y);
   WEBGL.uniform1f(param_scale, current_zoom);
   WEBGL.drawArrays(WEBGL.TRIANGLE_STRIP, 0, 4);
