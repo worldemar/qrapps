@@ -45,3 +45,5 @@ Building more complex WebGL app would likely require different approach (shaders
 or more agressive minifying/uglifying
 ![demo-glcube](demo-glcube/qr.svg)
 
+### [demo-shader](demo-shader/index.html)
+
