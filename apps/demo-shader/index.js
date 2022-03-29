@@ -41,8 +41,9 @@ void main() {
 `
 // Shortcuts to save javascript size.
 // These contain function names that are too long.
-var request_animation_frame = () => { requestAnimationFrame(refresh_canvas); };
-var not_eqal = (a, b) => (Math.abs(a-b) > 0.001);
+var request_animation_frame = () => {
+  requestAnimationFrame(refresh_canvas);
+};
 var webgl_get_uniform_location = (program, param_name) => {
   return WEBGL.getUniformLocation(program, param_name);
 };
@@ -64,12 +65,13 @@ var current_zoom = 3.;
 var target_center_x = -0.5;
 var target_center_y = 0;
 var target_zoom = 1.;
-var param_position;
 
 var vertexPosBuffer = WEBGL.createBuffer();
 WEBGL.viewport(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-WEBGL.bindBuffer(WEBGL.ARRAY_BUFFER, vertexPosBuffer);
-WEBGL.bufferData(WEBGL.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), WEBGL.STATIC_DRAW);
+var WEBGL_ARRAY_BUFFER = WEBGL.ARRAY_BUFFER;
+WEBGL.bindBuffer(WEBGL_ARRAY_BUFFER, vertexPosBuffer);
+WEBGL.bufferData(WEBGL_ARRAY_BUFFER,
+  new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), WEBGL.STATIC_DRAW);
 
 var program = WEBGL.createProgram();
 attach_shader_to_webgl(program, vertex_shader_code, WEBGL.VERTEX_SHADER);
@@ -97,19 +99,21 @@ window.onkeydown = function(event) {
   request_animation_frame();
 };
 
+var floats_not_equal = (a, b) => (Math.abs(a-b) > 0.001);
 var refresh_canvas = () => {
+  // as wordy as this looks - converting it to function won't save space
   WEBGL.uniform2f(param_canvas_size, CANVAS_WIDTH, CANVAS_HEIGHT);
   WEBGL.uniform2f(param_center, current_center_x, current_center_y);
   WEBGL.uniform1f(param_scale, current_zoom);
   WEBGL.drawArrays(WEBGL.TRIANGLE_STRIP, 0, 4);
-
-  if (not_eqal(current_center_x, target_center_x) || 
-      not_eqal(current_center_y, target_center_y) || 
-      not_eqal(current_zoom, target_zoom)) {
-    current_center_x += (target_center_x - current_center_x) * .1;
-    current_center_y += (target_center_y - current_center_y) * .1;
-    current_zoom += (target_zoom - current_zoom) * .1;
-    request_animation_frame();
+  // this look very long, but thanks to function above compresses incredibly well
+  if (floats_not_equal(current_center_x, target_center_x) || 
+      floats_not_equal(current_center_y, target_center_y) || 
+      floats_not_equal(current_zoom, target_zoom)) {
+        current_center_x += (target_center_x - current_center_x) * .1;
+        current_center_y += (target_center_y - current_center_y) * .1;
+        current_zoom += (target_zoom - current_zoom) * .1;
+        request_animation_frame();
   }
 }
 request_animation_frame();
