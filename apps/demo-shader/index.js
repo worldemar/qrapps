@@ -7,68 +7,59 @@ var julia_shader_source =
   'uniform vec2 cs,cp;' +
   // scale
   'uniform float s;' +
-  // mouse position
-  'uniform vec2 m;' +
+  // complex constant (the iterated one) position
+  'uniform vec2 c;' +
   //complex multiplication
-  'vec2 cm(vec2 a, vec2 b) { return vec2(a.x*b.x-a.y*b.y,a.x*b.y+a.y*b.x); }' +
-`
-#define MI 1000
-#define MD 255.0
-
-//conversion helper
-float f(float n, vec3 hsl){
-    float k = mod(n+hsl.x*12., 12.);
-    float a = hsl.y*min(hsl.z, 1.-hsl.z);
-    return hsl.z-a*max(min(k-3., min(9.-k, 1.)),-1.);
-}
-// hsl in range <0, 1>^3
-vec3 hsl2rgb(vec3 hsl){
-    return vec3(f(0.,hsl), f(8.,hsl), f(4.,hsl));
-}
-
-vec3 pc(vec2 tex, vec2 c) {
-  float maxdist = 0.0;
-  vec2 z = tex;
-  float d;
-  for(int i=0;i<MI;i++){
-    z = cm(z,z) + c;
-    d = length(z);
-    if (maxdist < d) {
-      maxdist = d;
-    }
-    if (maxdist > MD) {
-      float d1 = sqrt((float(i) - log2(log(d) / log(sqrt(MD))) + 1.)/log2(float(MI*MI)));
-      return hsl2rgb(vec3(0.8-d1/10.0, 1.0-d1, d1/2.0));
-    }
-  }
-  float d1 = d/maxdist; d1=d1*d1;d1=d1*d1;d1=d1*d1;d1=d1*d1;
-  return hsl2rgb(vec3(0.8-d1/3.0,0.5+d1/2.0,d1/4.0+0.25));
-}
-
-void main(){
-  vec2 t=(gl_FragCoord.xy/cs.xy)*2.0-vec2(1.0,1.0);
-  t.x=t.x*cs.x/cs.y;
-  t=t*s+cp;
-  vec2 c = m; //-vec2(1.0,1.0);
-  // vec2 c=(m.xy/cs.xy)*2.0-vec2(1.0,1.0);
-  // c.x=c.x*cs.x/cs.y;
-  // c.y=-c.y;
-  // c=c*s+cp;
-  float dot=s*0.01/length(c-t);
-  if (length(c-t) < 0.01*s) {
-    gl_FragColor=vec4(1.0,1.0,1.0,1.0);  
-    return;
-  }
-  if (length(c-t) > 0.01*s && length(c-t) < 0.015*s) {
-    gl_FragColor=vec4(0.0,0.0,0.0,1.0);  
-    return;
-  }
-  //vec2 c = vec2(0.27, -0.57);
-  //c = vec2(0.295, 0.5727);
-  // +hsl2rgb(vec3(dot/10.0,1.0,dot))
-  gl_FragColor=vec4(pc(t, c), 1.0);
-}
-`
+  'vec2 cm(vec2 a,vec2 b){return vec2(a.x*b.x-a.y*b.y,a.x*b.y+a.y*b.x);} ' +
+  // max iterations
+  'const int MI=300;' +
+  // max (bailout) distance)
+  'const float MD=1e8;' +
+  // hsl converter, makes it easy to get smooth color transition
+  'float f(float n,vec3 hsl){' +
+  'float k=mod(n+hsl.x*12.,12.);' +
+  'float a=hsl.y*min(hsl.z,1.-hsl.z);' +
+  'return hsl.z-a*max(min(k-3.,min(9.-k, 1.)),-1.);' +
+  '}' +
+  'vec3 hsl2rgb(vec3 hsl){' +
+  'return vec3(f(0.,hsl),f(8.,hsl),f(4.,hsl));' +
+  '}' +
+  // pixel color function
+  // inputs are complex coordinates of texture pixel t and complex constant c
+  'vec3 pc(vec2 t,vec2 c){' +
+  'float maxdist = 0.0;' +
+  'vec2 z=t;' +
+  'float d;' +
+  'for(int i=0;i<MI;i++){' +
+  'z=cm(z,z)+c;' +
+  'd=length(z);' +
+  'if (maxdist<d){maxdist=d;}' +
+  'if (maxdist>MD){' +
+  // external coloring
+  'float d1 = sqrt((float(i)-log2(log(d)/log(sqrt(MD)))+1.)/log2(float(MI*MI)));' +
+  'return hsl2rgb(vec3(0.8-d1/10.0,1.0-d1,d1/2.0));' +
+  '}' +
+  '}' +
+  // internal coloring
+  'float d1=d/maxdist;d1=d1*d1;d1=d1*d1;d1=d1*d1;d1=d1*d1;' +
+  'return hsl2rgb(vec3(0.8-d1/3.0,0.5+d1/2.0,d1/4.0+0.25));' +
+  '}' +
+  // imaging function
+  'void main(){' +
+  // t - coordinates of pixel on complex plane
+  'vec2 t=(gl_FragCoord.xy/cs.xy)*2.0-vec2(1.0,1.0);' +
+  't.x=t.x*cs.x/cs.y;' +
+  't=t*s+cp;' +
+  // draw current complex const position as white dot
+  'float D=length(c-t)/s;' +
+  'if (D<0.015){' +
+  'D=(D<0.01?1.0:0.0);' +
+  'gl_FragColor=vec4(D,D,D,1.0);' +
+  '}else{' +
+  // draw everything else with julia set
+  'gl_FragColor=vec4(pc(t, c), 1.0);' +
+  '}' +
+  '}'
 
 var fragment_shader_code = julia_shader_source;
 
@@ -126,7 +117,7 @@ var param_position = WEBGL.getAttribLocation(program, 'pos');
 var param_canvas_size = webgl_get_uniform_location(program, 'cs');
 var param_center = webgl_get_uniform_location(program, 'cp');
 var param_scale = webgl_get_uniform_location(program, 's');
-var param_m = webgl_get_uniform_location(program, 'm');
+var param_complex_constant = webgl_get_uniform_location(program, 'c');
 WEBGL.enableVertexAttribArray(param_position);
 WEBGL.vertexAttribPointer(param_position, 2, WEBGL.FLOAT, false, 0, 0);
 
@@ -162,11 +153,16 @@ canvas.onmousemove = (event) => {
   request_animation_frame();
 };
 canvas.onwheel = (e) => {
+  // TODO: simplify this.
+  // This is probably the ugliest part of code,
+  // eating a whopping 167 (!!!) bytes of final package.
+  // Zooms image in such a way that
+  // mouse keeps pointing to same image coordinates.
   var _left  = current_center_x + current_zoom * (-1) * canvas.width/canvas.height;
   var _right = current_center_x + current_zoom * (1) * canvas.width/canvas.height;
   var _top    = current_center_y + current_zoom * (-1);
   var _bottom = current_center_y + current_zoom * (1);
-  var z = -e.deltaY*0.001;  
+  var z = -e.deltaY*0.005;  
   _left += (current_mouse_x - _left) * z;
   _right += (current_mouse_x - _right) * z;
   _top += (current_mouse_y - _top) * z;
@@ -177,13 +173,12 @@ canvas.onwheel = (e) => {
   request_animation_frame();
 }
 
-
 var floats_not_equal = (a, b) => (Math.abs(a-b) > 0.000001);
 var refresh_canvas = () => {
   // as wordy as this looks - converting it to function won't save space
   WEBGL.uniform2f(param_canvas_size, CANVAS_WIDTH, CANVAS_HEIGHT);
   WEBGL.uniform2f(param_center, current_center_x, current_center_y);
-  WEBGL.uniform2f(param_m, current_const_x, current_const_y);
+  WEBGL.uniform2f(param_complex_constant, current_const_x, current_const_y);
   WEBGL.uniform1f(param_scale, current_zoom);
   WEBGL.drawArrays(WEBGL.TRIANGLE_STRIP, 0, 4);
   // this look very long, but thanks to function above compresses incredibly well
