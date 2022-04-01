@@ -130,19 +130,6 @@ var param_m = webgl_get_uniform_location(program, 'm');
 WEBGL.enableVertexAttribArray(param_position);
 WEBGL.vertexAttribPointer(param_position, 2, WEBGL.FLOAT, false, 0, 0);
 
-window.onkeydown = function(event) {
-  var key_code = event.keyCode;
-  // 37 = cursor left
-  // 39 = cursor right
-  target_center_x += 0.1*current_zoom*((key_code==39) - (key_code==37));
-  // 38 = cursor up
-  // 40 = cursor up
-  target_center_y += 0.1*current_zoom*((key_code==38) - (key_code==40));
-  // 107 = +
-  // 109 = -
-  target_zoom *= 1 + 0.1*((key_code==109) - (key_code==107));
-  request_animation_frame();
-};
 var event_coords = (e) => {
   var bounds = canvas.getBoundingClientRect();
   var x = current_center_x + current_zoom * (2*(e.clientX - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
@@ -168,10 +155,8 @@ canvas.onmousemove = (event) => {
         Math.abs(current_mouse_y-current_const_y) < current_zoom*0.01) {
           [current_const_x, current_const_y] = event_coords(event);
     } else {
-      target_center_x = pan_tex_cx - (event.clientX - pan_screen_mx)/canvas.height*current_zoom*2;
-      target_center_y = pan_tex_cy + (event.clientY - pan_screen_my)/canvas.height*current_zoom*2;
-      current_center_x = target_center_x;
-      current_center_y = target_center_y;
+      current_center_x = target_center_x = pan_tex_cx - (event.clientX - pan_screen_mx)/canvas.height*current_zoom*2;
+      current_center_y = target_center_y = pan_tex_cy + (event.clientY - pan_screen_my)/canvas.height*current_zoom*2;
     }
   }
   request_animation_frame();
