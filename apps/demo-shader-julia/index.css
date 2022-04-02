@@ -5,9 +5,22 @@ canvas {
 }
 
 div {
-    padding: 4px;
     position: absolute;
     color: white;
     font-family: monospace;
     background: rgba(0,0,0,0.5);
+}
+
+div#h {
+    padding: 16px;
+    font-size: 32px;
+}
+
+div#p,div#m {
+    font-size: 80px;
+    padding: 40px;
+}
+
+* {
+    touch-action: manipulation;
 }

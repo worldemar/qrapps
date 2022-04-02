@@ -9,6 +9,8 @@ var fragment_shader_code =
   'uniform float s;' +
   // complex constant (the iterated one) position
   'uniform vec2 c;' +
+  // complex constant dot size
+  'uniform float ds;' +
   //complex multiplication
   'vec2 cm(vec2 a,vec2 b){return vec2(a.x*b.x-a.y*b.y,a.x*b.y+a.y*b.x);} ' +
   // max iterations
@@ -27,21 +29,21 @@ var fragment_shader_code =
   // pixel color function
   // inputs are complex coordinates of texture pixel t and complex constant c
   'vec3 pc(vec2 t,vec2 c){' +
-  'float maxdist = 0.0;' +
+  'float md=0.0;' +
   'vec2 z=t;' +
   'float d;' +
   'for(int i=0;i<MI;i++){' +
   'z=cm(z,z)+c;' +
   'd=length(z);' +
-  'if (maxdist<d){maxdist=d;}' +
-  'if (maxdist>MD){' +
+  'if (md<d){md=d;}' +
+  'if (md>MD){' +
   // external coloring
-  'float d1 = sqrt((float(i)-log2(log(d)/log(sqrt(MD)))+1.)/log2(float(MI*MI)));' +
+  'float d1=sqrt((float(i)-log2(log(d)/log(sqrt(MD)))+1.)/log2(float(MI*MI)));' +
   'return hsl2rgb(vec3(1.0-d1/5.0,1.0-d1,0.1+d1/3.0));' +
   '}' +
   '}' +
   // internal coloring
-  'float d1=d/maxdist;d1=d1*d1;d1=d1*d1;d1=d1*d1;d1=d1*d1;' +
+  'float d1=d/md;d1=d1*d1;d1=d1*d1;d1=d1*d1;d1=d1*d1;' +
   'return hsl2rgb(vec3(0.8-d1/3.0,0.5+d1/2.0,d1/4.0+0.25));' +
   '}' +
   // imaging function
@@ -52,12 +54,12 @@ var fragment_shader_code =
   't=t*s+cp;' +
   // draw current complex const position as white dot
   'float D=length(c-t)/s;' +
-  'if (D<0.015){' +
-  'D=(D<0.01?1.0:0.0);' +
+  'if (D<ds){' +
+  'D=(D<(ds-0.005)?1.0:0.0);' +
   'gl_FragColor=vec4(D,D,D,1.0);' +
   '}else{' +
   // draw everything else with julia set
-  'gl_FragColor=vec4(pc(t, c), 1.0);' +
+  'gl_FragColor=vec4(pc(t,c),1.0);' +
   '}' +
   '}'
 
@@ -74,15 +76,33 @@ var attach_shader_to_webgl = (program, shader_source, shader_tupe) => {
 	WEBGL.shaderSource(shader, shader_source);
 	WEBGL.compileShader(shader);
 
-  var compiled = WEBGL.getShaderParameter(shader, WEBGL.COMPILE_STATUS);
-  if (!compiled) {
-    console.log(WEBGL.getShaderInfoLog(shader));
-  }
+  // uncomment this to debug shader errors
+  // var compiled = WEBGL.getShaderParameter(shader, WEBGL.COMPILE_STATUS);
+  // if (!compiled) {
+  //   console.log(WEBGL.getShaderInfoLog(shader));
+  // }
 
   WEBGL.attachShader(program, shader);
-	return shader;
+  return shader;
 };
 var to_fixed = (x) => { return x.toFixed(5); }
+var event_coords = (event) => {
+  var touch = event.touches.item(0);
+  var bounds = canvas.getBoundingClientRect();
+  var page_x = touch.pageX;
+  var page_y = touch.pageY;
+  var event_x = current_center_x + current_zoom * (2*(page_x - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
+  var event_y = current_center_y + current_zoom * (2*(bounds.bottom - page_y - bounds.top)/bounds.height - 1);
+  return [page_x, page_y, event_x, event_y];
+}
+
+var initialize_zoom_button = (div_id, offset, scale) => {
+  var zoom_div = document.getElementById(div_id);
+  zoom_div.style.left = window.innerWidth-offset;
+  zoom_div.ontouchstart = () => { current_zoom *= scale; request_animation_frame(); };
+}
+initialize_zoom_button('p', 120+16, 0.9);
+initialize_zoom_button('m', 120*2+32, 1.1);
 
 var canvas = document.getElementById('c');
 var help = document.getElementById('h');
@@ -112,79 +132,58 @@ var param_position = WEBGL.getAttribLocation(program, 'pos');
 var param_canvas_size = webgl_get_uniform_location(program, 'cs');
 var param_center = webgl_get_uniform_location(program, 'cp');
 var param_scale = webgl_get_uniform_location(program, 's');
+var param_complex_constant_size = webgl_get_uniform_location(program, 'ds');
 var param_complex_constant = webgl_get_uniform_location(program, 'c');
 WEBGL.enableVertexAttribArray(param_position);
 WEBGL.vertexAttribPointer(param_position, 2, WEBGL.FLOAT, false, 0, 0);
 
-var event_complex_coords = (event) => {
-  var bounds = canvas.getBoundingClientRect();
-  var event_x = current_center_x + current_zoom * (2*(event.clientX - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
-  var event_y = current_center_y + current_zoom * (2*(bounds.bottom - event.clientY - bounds.top)/bounds.height - 1);
-  return [event_x, event_y];
-}
-canvas.onmousedown = (event) => {
+canvas.ontouchstart = (event) => {
+  event.preventDefault();
   mouse_buttons_pressed++;
   if (mouse_buttons_pressed == 1) {
-    pan_screen_mx = event.clientX;
-    pan_screen_my = event.clientY;
+    var complex_x, complex_y;
+    [pan_screen_mx, pan_screen_my, complex_x, complex_y] = event_coords(event);
     pan_tex_cx = current_center_x;
     pan_tex_cy = current_center_y;
-    var event_x, event_y;
-    [event_x, event_y] = event_complex_coords(event);
-    if (Math.abs(event_x - current_const_x) < 0.02 &&
-        Math.abs(event_y - current_const_y) < 0.02) {
+    if (Math.abs(complex_x - current_const_x) < 0.1*current_zoom &&
+        Math.abs(complex_y - current_const_y) < 0.1*current_zoom) {
           mouse_dragging_const = true;
     }
   }
+  request_animation_frame();
 };
-canvas.onmouseup = () => {
+canvas.ontouchend = () => {
   mouse_buttons_pressed--;
   if (mouse_buttons_pressed == 0) {
     mouse_dragging_const = false;
   }
+  request_animation_frame();
 };
-canvas.onmousemove = (event) => {
-  [current_mouse_x, current_mouse_y] = event_complex_coords(event);
+canvas.ontouchmove = (event) => {
+  var screen_x, screen_y;
+  [screen_x, screen_y, current_mouse_x, current_mouse_y] = event_coords(event);
   if (mouse_buttons_pressed > 0) {
     if (mouse_dragging_const){
       current_const_x = current_mouse_x;
       current_const_y = current_mouse_y;
     } else {
-      current_center_x = pan_tex_cx - (event.clientX - pan_screen_mx)/canvas.height*current_zoom*2;
-      current_center_y = pan_tex_cy + (event.clientY - pan_screen_my)/canvas.height*current_zoom*2;
+      var screen_scale = current_zoom*2/canvas.height;
+      current_center_x = pan_tex_cx - (screen_x - pan_screen_mx)*screen_scale;
+      current_center_y = pan_tex_cy + (screen_y - pan_screen_my)*screen_scale;
     }
     request_animation_frame();
   }
 };
-canvas.onwheel = (e) => {
-  // TODO: simplify this.
-  // This is probably the ugliest part of code,
-  // eating a whopping 167 (!!!) bytes of final package.
-  // Zooms image in such a way that
-  // mouse keeps pointing to same image coordinates.
-  var _left  = current_center_x + current_zoom * (-1) * canvas.width/canvas.height;
-  var _right = current_center_x + current_zoom * (1) * canvas.width/canvas.height;
-  var _top    = current_center_y + current_zoom * (-1);
-  var _bottom = current_center_y + current_zoom * (1);
-  var z = -e.deltaY*0.0025;  
-  _left += (current_mouse_x - _left) * z;
-  _right += (current_mouse_x - _right) * z;
-  _top += (current_mouse_y - _top) * z;
-  _bottom += (current_mouse_y - _bottom) * z;
-  current_zoom = (_bottom - _top) / 2.0;
-  current_center_x = (_right + _left) / 2.0;
-  current_center_y = (_top + _bottom) / 2.0;
-  request_animation_frame();
-}
 
 var refresh_canvas = () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  WEBGL.viewport(0, 0, canvas.width, canvas.height);
+  var canvas_width = canvas.width = window.innerWidth;
+  var canvas_height = canvas.height = window.innerHeight;
+  WEBGL.viewport(0, 0, canvas_width, canvas_height);
   // as wordy as this looks - converting it to function won't save space
-  WEBGL.uniform2f(param_canvas_size, canvas.width, canvas.height);
+  WEBGL.uniform2f(param_canvas_size, canvas_width, canvas_height);
   WEBGL.uniform2f(param_center, current_center_x, current_center_y);
   WEBGL.uniform2f(param_complex_constant, current_const_x, current_const_y);
+  WEBGL.uniform1f(param_complex_constant_size, mouse_dragging_const ? 0.1 : 0.015 );
   WEBGL.uniform1f(param_scale, current_zoom);
   WEBGL.drawArrays(WEBGL.TRIANGLE_STRIP, 0, 4);
   help.innerHTML = [
