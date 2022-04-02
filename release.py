@@ -8,7 +8,7 @@ def write_app_info(app_name, readme_file):
     with open(app_readme_path, 'rb') as app_readme:
         readme_file.write(app_readme.read())
         readme_file.write(b'\n')
-    qr_code = f'![{app_name}]({app_name}/qr.svg)\n\n'
+    qr_code = f'![{app_name}]({app_name}/qr.png)\n\n'
     readme_file.write(qr_code.encode('utf-8'))
 
 

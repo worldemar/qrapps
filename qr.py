@@ -3,14 +3,14 @@ import shutil
 import argparse
 import subprocess
 import qrcode
-import qrcode.image.svg
+from qrcode.image.styledpil import StyledPilImage
 import qrcode.constants
 
 
-def html_to_qr(html_filename, svg_filename):
+def html_to_qr(html_filename, png_filename):
     qr_code = qrcode.QRCode(
         version=None,
-        image_factory=qrcode.image.svg.SvgPathFillImage,
+        image_factory=StyledPilImage,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
     )
     with open(html_filename, 'rb') as f_html:
@@ -22,7 +22,7 @@ def html_to_qr(html_filename, svg_filename):
         print(f'QR code fit size: {qr_code.best_fit()}')
     qr_code.make(fit=True)
     img = qr_code.make_image()
-    img.save(svg_filename)
+    img.save(png_filename)
 
 
 def inline_scripts(html_filename, out_filename):
@@ -85,7 +85,7 @@ def main():
 
     bundle_filename = os.path.join(html_tmp_dir, 'index.html')
     mini_filename = os.path.join(deploy_directory, 'index.html')
-    svg_filename = os.path.join(deploy_directory, 'qr.svg')
+    png_filename = os.path.join(deploy_directory, 'qr.png')
 
     if os.path.isdir(html_tmp_dir):
         shutil.rmtree(html_tmp_dir)
@@ -115,7 +115,7 @@ def main():
 
     html_to_qr(
         mini_filename,
-        svg_filename
+        png_filename
     )
 
 
