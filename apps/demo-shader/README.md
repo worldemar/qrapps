@@ -1,3 +1,2 @@
-Simple demo showcasing fragment shader using WebGL.
-Contains minimal (about 50 lines, just over 1kb compressed) of boilerplate code to run single fragment shader.
-Mandelbrot set shader added for demonstration purposes based on [WebGL101](https://github.com/emoller/WebGL101) fragment shader example. Controls are cursor keys, `+` and `-`.
+Demo showcasing interactive fragment shader using WebGL.
+Displays julia set with pan, zoom and ability to move constant point by drag-and-drop.

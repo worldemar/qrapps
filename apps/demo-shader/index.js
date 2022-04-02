@@ -1,7 +1,7 @@
 // Vertex shader is completely unrelated in this demo,
 // so I decided to squeeze it to single line
 var vertex_shader_code = 'attribute vec2 pos;void main(){gl_Position=vec4(pos,0,1);}'
-var julia_shader_source = 
+var fragment_shader_code =
   'precision highp float;' +
   // canvas size ansd center point
   'uniform vec2 cs,cp;' +
@@ -12,7 +12,7 @@ var julia_shader_source =
   //complex multiplication
   'vec2 cm(vec2 a,vec2 b){return vec2(a.x*b.x-a.y*b.y,a.x*b.y+a.y*b.x);} ' +
   // max iterations
-  'const int MI=300;' +
+  'const int MI=500;' +
   // max (bailout) distance)
   'const float MD=1e8;' +
   // hsl converter, makes it easy to get smooth color transition
@@ -37,7 +37,7 @@ var julia_shader_source =
   'if (maxdist>MD){' +
   // external coloring
   'float d1 = sqrt((float(i)-log2(log(d)/log(sqrt(MD)))+1.)/log2(float(MI*MI)));' +
-  'return hsl2rgb(vec3(0.8-d1/10.0,1.0-d1,d1/2.0));' +
+  'return hsl2rgb(vec3(1.0-d1/5.0,1.0-d1,0.1+d1/3.0));' +
   '}' +
   '}' +
   // internal coloring
@@ -61,8 +61,6 @@ var julia_shader_source =
   '}' +
   '}'
 
-var fragment_shader_code = julia_shader_source;
-
 // Shortcuts to save javascript size.
 // These contain function names that are too long.
 var request_animation_frame = () => {
@@ -84,11 +82,11 @@ var attach_shader_to_webgl = (program, shader_source, shader_tupe) => {
   WEBGL.attachShader(program, shader);
 	return shader;
 };
+var to_fixed = (x) => { return x.toFixed(5); }
 
 var canvas = document.getElementById('c');
+var help = document.getElementById('h');
 var WEBGL = canvas.getContext('webgl');
-var CANVAS_WIDTH = canvas.width = window.innerWidth;
-var CANVAS_HEIGHT = canvas.height = window.innerHeight;
 var current_center_x = 0;
 var current_center_y = 0;
 var current_zoom = 2.0;
@@ -99,7 +97,6 @@ var pan_tex_cx = 0.0, pan_tex_cy = 0.0;
 var mouse_buttons_pressed = 0;
 
 var vertexPosBuffer = WEBGL.createBuffer();
-WEBGL.viewport(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 var WEBGL_ARRAY_BUFFER = WEBGL.ARRAY_BUFFER;
 WEBGL.bindBuffer(WEBGL_ARRAY_BUFFER, vertexPosBuffer);
 WEBGL.bufferData(WEBGL_ARRAY_BUFFER,
@@ -118,12 +115,6 @@ var param_complex_constant = webgl_get_uniform_location(program, 'c');
 WEBGL.enableVertexAttribArray(param_position);
 WEBGL.vertexAttribPointer(param_position, 2, WEBGL.FLOAT, false, 0, 0);
 
-var event_coords = (e) => {
-  var bounds = canvas.getBoundingClientRect();
-  var x = current_center_x + current_zoom * (2*(e.clientX - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
-  var y = current_center_y + current_zoom * (2*(bounds.bottom - e.clientY - bounds.top)/bounds.height - 1);
-  return [x, y];
-}
 canvas.onmousedown = (event) => {
   mouse_buttons_pressed++;
   if (mouse_buttons_pressed == 1) {
@@ -137,11 +128,14 @@ canvas.onmouseup = () => {
   mouse_buttons_pressed--;
 };
 canvas.onmousemove = (event) => {
-  [current_mouse_x, current_mouse_y] = event_coords(event);
+  var bounds = canvas.getBoundingClientRect();
+  var current_mouse_x = current_center_x + current_zoom * (2*(event.clientX - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
+  var current_mouse_y = current_center_y + current_zoom * (2*(bounds.bottom - event.clientY - bounds.top)/bounds.height - 1);
   if (mouse_buttons_pressed > 0) {
     if (Math.abs(current_mouse_x-current_const_x) < current_zoom*0.01 &&
         Math.abs(current_mouse_y-current_const_y) < current_zoom*0.01) {
-          [current_const_x, current_const_y] = event_coords(event);
+          current_const_x = current_mouse_x;
+          current_const_y = current_mouse_y;
     } else {
       current_center_x = pan_tex_cx - (event.clientX - pan_screen_mx)/canvas.height*current_zoom*2;
       current_center_y = pan_tex_cy + (event.clientY - pan_screen_my)/canvas.height*current_zoom*2;
@@ -159,7 +153,7 @@ canvas.onwheel = (e) => {
   var _right = current_center_x + current_zoom * (1) * canvas.width/canvas.height;
   var _top    = current_center_y + current_zoom * (-1);
   var _bottom = current_center_y + current_zoom * (1);
-  var z = -e.deltaY*0.005;  
+  var z = -e.deltaY*0.0025;  
   _left += (current_mouse_x - _left) * z;
   _right += (current_mouse_x - _right) * z;
   _top += (current_mouse_y - _top) * z;
@@ -170,13 +164,21 @@ canvas.onwheel = (e) => {
   request_animation_frame();
 }
 
-// var floats_not_equal = (a, b) => (Math.abs(a-b) > 0.000001);
 var refresh_canvas = () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  WEBGL.viewport(0, 0, canvas.width, canvas.height);
   // as wordy as this looks - converting it to function won't save space
-  WEBGL.uniform2f(param_canvas_size, CANVAS_WIDTH, CANVAS_HEIGHT);
+  WEBGL.uniform2f(param_canvas_size, canvas.width, canvas.height);
   WEBGL.uniform2f(param_center, current_center_x, current_center_y);
   WEBGL.uniform2f(param_complex_constant, current_const_x, current_const_y);
   WEBGL.uniform1f(param_scale, current_zoom);
   WEBGL.drawArrays(WEBGL.TRIANGLE_STRIP, 0, 4);
+  help.innerHTML = [
+      'Center: ' + to_fixed(current_center_x) + ',' + to_fixed(current_center_y),
+      'Constant: ' + to_fixed(current_const_x) + ',' + to_fixed(current_const_y),
+      'Zoom: ' + to_fixed(current_zoom)
+    ].join('<br/>')
 }
+window.onresize = request_animation_frame;
 request_animation_frame();
