@@ -129,8 +129,8 @@ canvas.onmouseup = () => {
 };
 canvas.onmousemove = (event) => {
   var bounds = canvas.getBoundingClientRect();
-  var current_mouse_x = current_center_x + current_zoom * (2*(event.clientX - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
-  var current_mouse_y = current_center_y + current_zoom * (2*(bounds.bottom - event.clientY - bounds.top)/bounds.height - 1);
+  current_mouse_x = current_center_x + current_zoom * (2*(event.clientX - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
+  current_mouse_y = current_center_y + current_zoom * (2*(bounds.bottom - event.clientY - bounds.top)/bounds.height - 1);
   if (mouse_buttons_pressed > 0) {
     if (Math.abs(current_mouse_x-current_const_x) < current_zoom*0.01 &&
         Math.abs(current_mouse_y-current_const_y) < current_zoom*0.01) {
@@ -140,8 +140,8 @@ canvas.onmousemove = (event) => {
       current_center_x = pan_tex_cx - (event.clientX - pan_screen_mx)/canvas.height*current_zoom*2;
       current_center_y = pan_tex_cy + (event.clientY - pan_screen_my)/canvas.height*current_zoom*2;
     }
+    request_animation_frame();
   }
-  request_animation_frame();
 };
 canvas.onwheel = (e) => {
   // TODO: simplify this.
