@@ -92,9 +92,6 @@ var CANVAS_HEIGHT = canvas.height = window.innerHeight;
 var current_center_x = 0;
 var current_center_y = 0;
 var current_zoom = 2.0;
-var target_center_x = 0;
-var target_center_y = 0;
-var target_zoom = 2.0;
 var current_const_x = 0.0, current_const_y = 0.0;
 var current_mouse_x = 0.0, current_mouse_y = 0.0;
 var pan_screen_mx = 0.0, pan_screen_my = 0.0;
@@ -146,8 +143,8 @@ canvas.onmousemove = (event) => {
         Math.abs(current_mouse_y-current_const_y) < current_zoom*0.01) {
           [current_const_x, current_const_y] = event_coords(event);
     } else {
-      current_center_x = target_center_x = pan_tex_cx - (event.clientX - pan_screen_mx)/canvas.height*current_zoom*2;
-      current_center_y = target_center_y = pan_tex_cy + (event.clientY - pan_screen_my)/canvas.height*current_zoom*2;
+      current_center_x = pan_tex_cx - (event.clientX - pan_screen_mx)/canvas.height*current_zoom*2;
+      current_center_y = pan_tex_cy + (event.clientY - pan_screen_my)/canvas.height*current_zoom*2;
     }
   }
   request_animation_frame();
@@ -167,13 +164,13 @@ canvas.onwheel = (e) => {
   _right += (current_mouse_x - _right) * z;
   _top += (current_mouse_y - _top) * z;
   _bottom += (current_mouse_y - _bottom) * z;
-  target_zoom = (_bottom - _top) / 2.0;
-  target_center_x = (_right + _left) / 2.0;
-  target_center_y = (_top + _bottom) / 2.0;
+  current_zoom = (_bottom - _top) / 2.0;
+  current_center_x = (_right + _left) / 2.0;
+  current_center_y = (_top + _bottom) / 2.0;
   request_animation_frame();
 }
 
-var floats_not_equal = (a, b) => (Math.abs(a-b) > 0.000001);
+// var floats_not_equal = (a, b) => (Math.abs(a-b) > 0.000001);
 var refresh_canvas = () => {
   // as wordy as this looks - converting it to function won't save space
   WEBGL.uniform2f(param_canvas_size, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -181,14 +178,5 @@ var refresh_canvas = () => {
   WEBGL.uniform2f(param_complex_constant, current_const_x, current_const_y);
   WEBGL.uniform1f(param_scale, current_zoom);
   WEBGL.drawArrays(WEBGL.TRIANGLE_STRIP, 0, 4);
-  // this look very long, but thanks to function above compresses incredibly well
-  if (floats_not_equal(current_center_x, target_center_x) || 
-      floats_not_equal(current_center_y, target_center_y) || 
-      floats_not_equal(current_zoom, target_zoom)) {
-        current_center_x += (target_center_x - current_center_x) * .1;
-        current_center_y += (target_center_y - current_center_y) * .1;
-        current_zoom += (target_zoom - current_zoom) * .1;
-        request_animation_frame();
-  }
 }
 request_animation_frame();
