@@ -30,13 +30,13 @@ Generated automatically on push and published to https://worldemar.github.io/qra
 
 Simple demo showcasing mouse tracking and canvas drawing
 
-![demo-canvas](demo-canvas/qr.svg)
+![demo-canvas](demo-canvas/qr.png)
 
 ### [demo-clock](demo-clock/index.html)
 
 Simplest demo showcasing proof-of-concept.
 
-![demo-clock](demo-clock/qr.svg)
+![demo-clock](demo-clock/qr.png)
 
 ### [demo-glcube](demo-glcube/index.html)
 
@@ -45,7 +45,7 @@ Uses internal 600-character matrix library and no engine.
 Fitting it into QR code was not easy nor pretty, some parts of code are not very readable.
 Building more complex WebGL app would likely require different approach (shaders?)
 or more agressive minifying/uglifying
-![demo-glcube](demo-glcube/qr.svg)
+![demo-glcube](demo-glcube/qr.png)
 
 ### [demo-shader](demo-shader/index.html)
 
@@ -53,12 +53,12 @@ Simple demo showcasing fragment shader using WebGL.
 Contains minimal (about 50 lines, just over 1kb compressed) of boilerplate code to run single fragment shader.
 Mandelbrot set shader added for demonstration purposes based on [WebGL101](https://github.com/emoller/WebGL101) fragment shader example. Controls are cursor keys, `+` and `-`.
 
-![demo-shader](demo-shader/qr.svg)
+![demo-shader](demo-shader/qr.png)
 
 ### [demo-shader-julia](demo-shader-julia/index.html)
 
 Demo showcasing interactive fragment shader using WebGL.
 Displays julia set with pan, zoom and ability to move constant point by drag-and-drop.
 
-![demo-shader-julia](demo-shader-julia/qr.svg)
+![demo-shader-julia](demo-shader-julia/qr.png)
 
