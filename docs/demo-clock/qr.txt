@@ -1,0 +1,1 @@
+data:text/html,<script>var e=()=>setTimeout(t,1e3),t=()=>{document.getElementById("d").innerHTML=(new Date).toLocaleString(),e()};e()</script><h2 id="d"></h2>
