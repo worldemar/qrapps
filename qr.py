@@ -11,6 +11,8 @@ def html_to_qr(html_filename, png_filename):
     qr_code = qrcode.QRCode(
         version=None,
         image_factory=StyledPilImage,
+        border=4,
+        box_size=2,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
     )
     with open(html_filename, 'rb') as f_html:
