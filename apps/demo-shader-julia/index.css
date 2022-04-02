@@ -8,7 +8,7 @@ div {
     position: fixed;
     color: #fff;
     font-family: monospace;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0);
 }
 
 div#h {

@@ -7,7 +7,25 @@ from qrcode.image.styledpil import StyledPilImage
 import qrcode.constants
 
 
-def html_to_qr(html_filename, png_filename):
+def html_to_url(html_filename, txt_filename):
+    with open(html_filename, 'rb') as f_html:
+        html_text = f_html.read().decode('utf-8')
+
+    print(f'HTML src size: {len(html_text)}')
+
+    # You might think urllib.parse.quote is a better solution,
+    # but it escapes too much stuff and bloats data,
+    # significantly reducing effective QR capacity
+    html_text_escaped = html_text.replace('#', '%' + '23')
+
+    print(f'HTML rdy size: {len(html_text_escaped)}')
+    data_url = 'data:text/html,' + html_text_escaped
+    qr_data_encoded = data_url.encode('ascii')
+    with open(txt_filename, 'wb') as f_txt:
+        f_txt.write(qr_data_encoded)
+
+
+def url_to_qr(url_filename, png_filename):
     qr_code = qrcode.QRCode(
         version=None,
         image_factory=StyledPilImage,
@@ -15,10 +33,10 @@ def html_to_qr(html_filename, png_filename):
         box_size=2,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
     )
-    with open(html_filename, 'rb') as f_html:
-        qr_data = 'data:text/html,' + f_html.read().decode('utf-8')
-        qr_code.add_data(qr_data.encode('ascii'))
-        print('Data chunks ready:')
+    with open(url_filename, 'rb') as f_url:
+        html_text = f_url.read().decode('utf-8')
+        qr_code.add_data(html_text)
+        print('QR data dump:')
         for i in qr_code.data_list:
             print(f'- bytes={len(i.data)} mode={i.mode} content={i.data[:64]}')
         print(f'QR code fit size: {qr_code.best_fit()}')
@@ -87,6 +105,7 @@ def main():
 
     bundle_filename = os.path.join(html_tmp_dir, 'index.html')
     mini_filename = os.path.join(deploy_directory, 'index.html')
+    url_filename = os.path.join(deploy_directory, 'qr.txt')
     png_filename = os.path.join(deploy_directory, 'qr.png')
 
     if os.path.isdir(html_tmp_dir):
@@ -105,7 +124,7 @@ def main():
     )
     os.remove(tmp_file)
     bundle_size = os.stat(bundle_filename).st_size
-    print(f'Bundle size: {bundle_size}')
+    print(f'Combined size: {bundle_size}')
 
     minify(
         bundle_filename,
@@ -113,10 +132,18 @@ def main():
         os.path.join(html_tmp_dir, 'minify.json')
     )
     mini_size = os.stat(mini_filename).st_size
-    print(f'Mini size: {mini_size}/2953')
+    print(f'Minified size: {mini_size}')
 
-    html_to_qr(
+    html_to_url(
         mini_filename,
+        url_filename
+    )
+
+    url_size = os.stat(url_filename).st_size
+    print(f'URL data size: {url_size} of 2953 (QR capacity)')
+
+    url_to_qr(
+        url_filename,
         png_filename
     )
 
