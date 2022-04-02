@@ -1,6 +1,6 @@
 // Vertex shader is completely unrelated in this demo,
 // so I decided to squeeze it to single line
-var vertex_shader_code = 'attribute vec2 pos;void main(){gl_Position=vec4(pos,0,1);}'
+var vertex_shader_code = 'attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}'
 var fragment_shader_code =
   'precision highp float;' +
   // canvas size ansd center point
@@ -14,7 +14,7 @@ var fragment_shader_code =
   //complex multiplication
   'vec2 cm(vec2 a,vec2 b){return vec2(a.x*b.x-a.y*b.y,a.x*b.y+a.y*b.x);} ' +
   // max iterations
-  'const int MI=500;' +
+  'const int MI=250;' +
   // max (bailout) distance)
   'const float MD=1e8;' +
   // hsl converter, makes it easy to get smooth color transition
@@ -91,8 +91,10 @@ var event_coords = (event) => {
   var bounds = canvas.getBoundingClientRect();
   var page_x = touch.pageX;
   var page_y = touch.pageY;
-  var event_x = current_center_x + current_zoom * (2*(page_x - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
-  var event_y = current_center_y + current_zoom * (2*(bounds.height - page_y)/bounds.height - 1);
+  var event_x = current_center_x +
+    current_zoom * (2 * (page_x - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
+  var event_y = current_center_y + 
+    current_zoom * (2 * (bounds.height - page_y)/bounds.height - 1);
   return [page_x, page_y, event_x, event_y];
 }
 
@@ -128,7 +130,7 @@ attach_shader_to_webgl(program, vertex_shader_code, WEBGL.VERTEX_SHADER);
 attach_shader_to_webgl(program, fragment_shader_code, WEBGL.FRAGMENT_SHADER);
 WEBGL.linkProgram(program);
 WEBGL.useProgram(program);
-var param_position = WEBGL.getAttribLocation(program, 'pos');
+var param_position = WEBGL.getAttribLocation(program, 'p');
 var param_canvas_size = webgl_get_uniform_location(program, 'cs');
 var param_center = webgl_get_uniform_location(program, 'cp');
 var param_scale = webgl_get_uniform_location(program, 's');
@@ -145,8 +147,8 @@ canvas.ontouchstart = (event) => {
     [pan_screen_mx, pan_screen_my, complex_x, complex_y] = event_coords(event);
     pan_tex_cx = current_center_x;
     pan_tex_cy = current_center_y;
-    if (Math.abs(complex_x - current_const_x) < 0.1*current_zoom &&
-        Math.abs(complex_y - current_const_y) < 0.1*current_zoom) {
+    if (Math.abs(complex_x - current_const_x) < 0.1 * current_zoom &&
+        Math.abs(complex_y - current_const_y) < 0.1 * current_zoom) {
           mouse_dragging_const = true;
     }
   }
@@ -167,7 +169,7 @@ canvas.ontouchmove = (event) => {
       current_const_x = current_mouse_x;
       current_const_y = current_mouse_y;
     } else {
-      var screen_scale = current_zoom*2/canvas.height;
+      var screen_scale = current_zoom * 2 / canvas.height;
       current_center_x = pan_tex_cx - (screen_x - pan_screen_mx)*screen_scale;
       current_center_y = pan_tex_cy + (screen_y - pan_screen_my)*screen_scale;
     }
