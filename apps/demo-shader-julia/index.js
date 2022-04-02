@@ -14,7 +14,7 @@ var fragment_shader_code =
   //complex multiplication
   'vec2 cm(vec2 a,vec2 b){return vec2(a.x*b.x-a.y*b.y,a.x*b.y+a.y*b.x);} ' +
   // max iterations
-  'const int MI=250;' +
+  'const int MI=254;' +
   // max (bailout) distance)
   'const float MD=1e8;' +
   // hsl converter, makes it easy to get smooth color transition
@@ -85,16 +85,16 @@ var attach_shader_to_webgl = (program, shader_source, shader_tupe) => {
   WEBGL.attachShader(program, shader);
   return shader;
 };
-var to_fixed_width = (x) => { return x.toFixed(5); }
+var to_fixed_width = (the_float) => { return the_float.toFixed(5); }
 var event_coords = (event) => {
   var touch = event.touches.item(0);
   var bounds = canvas.getBoundingClientRect();
   var page_x = touch.pageX;
   var page_y = touch.pageY;
   var event_x = current_center_x +
-    current_zoom * (2 * (page_x - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
+    current_zoom * (2 * (page_x - bounds.left) / bounds.width - 1) * bounds.width / bounds.height;
   var event_y = current_center_y + 
-    current_zoom * (2 * (bounds.height - page_y)/bounds.height - 1);
+    current_zoom * (2 * (bounds.height - page_y) / bounds.height - 1);
   return [page_x, page_y, event_x, event_y];
 }
 
