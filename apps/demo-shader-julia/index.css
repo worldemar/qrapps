@@ -1,0 +1,13 @@
+canvas {
+    left: 0px;
+    top: 0px;
+    position: absolute;
+}
+
+div {
+    padding: 4px;
+    position: absolute;
+    color: white;
+    font-family: monospace;
+    background: rgba(0,0,0,0.5);
+}
