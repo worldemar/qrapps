@@ -55,3 +55,10 @@ Mandelbrot set shader added for demonstration purposes based on [WebGL101](https
 
 ![demo-shader](demo-shader/qr.svg)
 
+### [demo-shader-julia](demo-shader-julia/index.html)
+
+Demo showcasing interactive fragment shader using WebGL.
+Displays julia set with pan, zoom and ability to move constant point by drag-and-drop.
+
+![demo-shader-julia](demo-shader-julia/qr.svg)
+
