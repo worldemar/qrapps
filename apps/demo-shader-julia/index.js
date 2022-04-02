@@ -14,37 +14,36 @@ var fragment_shader_code =
   //complex multiplication
   'vec2 cm(vec2 a,vec2 b){return vec2(a.x*b.x-a.y*b.y,a.x*b.y+a.y*b.x);} ' +
   // max iterations
-  'const int MI=254;' +
-  // max (bailout) distance)
-  'const float MD=1e8;' +
+  'const int I=254;' +
   // hsl converter, makes it easy to get smooth color transition
   'float f(float n,vec3 hsl){' +
   'float k=mod(n+hsl.x*12.,12.);' +
   'float a=hsl.y*min(hsl.z,1.-hsl.z);' +
   'return hsl.z-a*max(min(k-3.,min(9.-k, 1.)),-1.);' +
   '}' +
-  'vec3 hsl2rgb(vec3 hsl){' +
+  'vec3 C(vec3 hsl){' +
   'return vec3(f(0.,hsl),f(8.,hsl),f(4.,hsl));' +
   '}' +
   // pixel color function
   // inputs are complex coordinates of texture pixel t and complex constant c
   'vec3 pc(vec2 t,vec2 c){' +
-  'float md=.0;' +
+  'float O=.0;' +
   'vec2 z=t;' +
   'float d;' +
-  'for(int i=0;i<MI;i++){' +
+  'for(int i=0;i<I;i++){' +
   'z=cm(z,z)+c;' +
   'd=length(z);' +
-  'if(md<d){md=d;}' +
-  'if(md>MD){' +
+  'O=O<d?d:O;' +
+  // 1e8 is max (bailout) distance)
+  'if(O>1e8){' +
   // external coloring
-  'float l=sqrt((float(i)-log2(log(d)/log(sqrt(MD)))+1.)/log2(float(MI*MI)));' +
-  'return hsl2rgb(vec3(1.-l/5.,1.-l,.1+l/3.));' +
+  'float l=sqrt((float(i)-log2(log(d)/log(sqrt(1e8)))+1.)/log2(float(I*I)));' +
+  'return C(vec3(1.-l/5.,1.-l,.1+l/3.));' +
   '}' +
   '}' +
   // internal coloring
-  'float l=pow(d/md,16.);' +
-  'return hsl2rgb(vec3(.8-l/3.,.5+l/2.,l/4.+.25));' +
+  'float l=pow(d/O,16.);' +
+  'return C(vec3(.8-l/3.,.5+l/2.,l/4.+.25));' +
   '}' +
   // imaging function
   'void main(){' +
@@ -103,8 +102,8 @@ var initialize_zoom_button = (div_id, offset, scale) => {
   zoom_div.style.left = window.innerWidth-offset;
   zoom_div.ontouchstart = () => { current_zoom *= scale; request_animation_frame(); };
 }
-initialize_zoom_button('p', 120+16, 0.9);
-initialize_zoom_button('m', 120*2+32, 1.1);
+initialize_zoom_button('p', 190, 0.9);
+initialize_zoom_button('m', 380, 1.1);
 
 var canvas = document.getElementById('c');
 var help = document.getElementById('h');
