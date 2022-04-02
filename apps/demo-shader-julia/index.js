@@ -95,6 +95,7 @@ var current_mouse_x = 0.0, current_mouse_y = 0.0;
 var pan_screen_mx = 0.0, pan_screen_my = 0.0;
 var pan_tex_cx = 0.0, pan_tex_cy = 0.0;
 var mouse_buttons_pressed = 0;
+var mouse_dragging_const = false;
 
 var vertexPosBuffer = WEBGL.createBuffer();
 var WEBGL_ARRAY_BUFFER = WEBGL.ARRAY_BUFFER;
@@ -115,6 +116,12 @@ var param_complex_constant = webgl_get_uniform_location(program, 'c');
 WEBGL.enableVertexAttribArray(param_position);
 WEBGL.vertexAttribPointer(param_position, 2, WEBGL.FLOAT, false, 0, 0);
 
+var event_complex_coords = (event) => {
+  var bounds = canvas.getBoundingClientRect();
+  var event_x = current_center_x + current_zoom * (2*(event.clientX - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
+  var event_y = current_center_y + current_zoom * (2*(bounds.bottom - event.clientY - bounds.top)/bounds.height - 1);
+  return [event_x, event_y];
+}
 canvas.onmousedown = (event) => {
   mouse_buttons_pressed++;
   if (mouse_buttons_pressed == 1) {
@@ -122,20 +129,26 @@ canvas.onmousedown = (event) => {
     pan_screen_my = event.clientY;
     pan_tex_cx = current_center_x;
     pan_tex_cy = current_center_y;
+    var event_x, event_y;
+    [event_x, event_y] = event_complex_coords(event);
+    if (Math.abs(event_x - current_const_x) < 0.02 &&
+        Math.abs(event_y - current_const_y) < 0.02) {
+          mouse_dragging_const = true;
+    }
   }
 };
 canvas.onmouseup = () => {
   mouse_buttons_pressed--;
+  if (mouse_buttons_pressed == 0) {
+    mouse_dragging_const = false;
+  }
 };
 canvas.onmousemove = (event) => {
-  var bounds = canvas.getBoundingClientRect();
-  current_mouse_x = current_center_x + current_zoom * (2*(event.clientX - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
-  current_mouse_y = current_center_y + current_zoom * (2*(bounds.bottom - event.clientY - bounds.top)/bounds.height - 1);
+  [current_mouse_x, current_mouse_y] = event_complex_coords(event);
   if (mouse_buttons_pressed > 0) {
-    if (Math.abs(current_mouse_x-current_const_x) < current_zoom*0.01 &&
-        Math.abs(current_mouse_y-current_const_y) < current_zoom*0.01) {
-          current_const_x = current_mouse_x;
-          current_const_y = current_mouse_y;
+    if (mouse_dragging_const){
+      current_const_x = current_mouse_x;
+      current_const_y = current_mouse_y;
     } else {
       current_center_x = pan_tex_cx - (event.clientX - pan_screen_mx)/canvas.height*current_zoom*2;
       current_center_y = pan_tex_cy + (event.clientY - pan_screen_my)/canvas.height*current_zoom*2;
