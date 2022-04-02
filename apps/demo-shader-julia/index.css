@@ -1,12 +1,12 @@
 canvas {
-    left: 0px;
-    top: 0px;
-    position: absolute;
+    left: 0;
+    top: 0;
+    position: fixed;
 }
 
 div {
-    position: absolute;
-    color: white;
+    position: fixed;
+    color: #fff;
     font-family: monospace;
     background: rgba(0,0,0,0.5);
 }
@@ -22,5 +22,5 @@ div#p,div#m {
 }
 
 * {
-    touch-action: manipulation;
+    touch-action: none;
 }

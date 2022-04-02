@@ -29,37 +29,37 @@ var fragment_shader_code =
   // pixel color function
   // inputs are complex coordinates of texture pixel t and complex constant c
   'vec3 pc(vec2 t,vec2 c){' +
-  'float md=0.0;' +
+  'float md=.0;' +
   'vec2 z=t;' +
   'float d;' +
   'for(int i=0;i<MI;i++){' +
   'z=cm(z,z)+c;' +
   'd=length(z);' +
-  'if (md<d){md=d;}' +
-  'if (md>MD){' +
+  'if(md<d){md=d;}' +
+  'if(md>MD){' +
   // external coloring
-  'float d1=sqrt((float(i)-log2(log(d)/log(sqrt(MD)))+1.)/log2(float(MI*MI)));' +
-  'return hsl2rgb(vec3(1.0-d1/5.0,1.0-d1,0.1+d1/3.0));' +
+  'float l=sqrt((float(i)-log2(log(d)/log(sqrt(MD)))+1.)/log2(float(MI*MI)));' +
+  'return hsl2rgb(vec3(1.-l/5.,1.-l,.1+l/3.));' +
   '}' +
   '}' +
   // internal coloring
-  'float d1=d/md;d1=d1*d1;d1=d1*d1;d1=d1*d1;d1=d1*d1;' +
-  'return hsl2rgb(vec3(0.8-d1/3.0,0.5+d1/2.0,d1/4.0+0.25));' +
+  'float l=pow(d/md,16.);' +
+  'return hsl2rgb(vec3(.8-l/3.,.5+l/2.,l/4.+.25));' +
   '}' +
   // imaging function
   'void main(){' +
   // t - coordinates of pixel on complex plane
-  'vec2 t=(gl_FragCoord.xy/cs.xy)*2.0-vec2(1.0,1.0);' +
+  'vec2 t=(gl_FragCoord.xy/cs.xy)*2.-vec2(1.,1.);' +
   't.x=t.x*cs.x/cs.y;' +
   't=t*s+cp;' +
   // draw current complex const position as white dot
   'float D=length(c-t)/s;' +
   'if (D<ds){' +
-  'D=(D<(ds-0.005)?1.0:0.0);' +
-  'gl_FragColor=vec4(D,D,D,1.0);' +
+  'D=(D<(ds-.005)?1.:.0);' +
+  'gl_FragColor=vec4(D,D,D,1.);' +
   '}else{' +
   // draw everything else with julia set
-  'gl_FragColor=vec4(pc(t,c),1.0);' +
+  'gl_FragColor=vec4(pc(t,c),1.);' +
   '}' +
   '}'
 
@@ -85,14 +85,14 @@ var attach_shader_to_webgl = (program, shader_source, shader_tupe) => {
   WEBGL.attachShader(program, shader);
   return shader;
 };
-var to_fixed = (x) => { return x.toFixed(5); }
+var to_fixed_width = (x) => { return x.toFixed(5); }
 var event_coords = (event) => {
   var touch = event.touches.item(0);
   var bounds = canvas.getBoundingClientRect();
   var page_x = touch.pageX;
   var page_y = touch.pageY;
   var event_x = current_center_x + current_zoom * (2*(page_x - bounds.left)/bounds.width - 1)*bounds.width/bounds.height;
-  var event_y = current_center_y + current_zoom * (2*(bounds.bottom - page_y - bounds.top)/bounds.height - 1);
+  var event_y = current_center_y + current_zoom * (2*(bounds.height - page_y)/bounds.height - 1);
   return [page_x, page_y, event_x, event_y];
 }
 
@@ -107,8 +107,8 @@ initialize_zoom_button('m', 120*2+32, 1.1);
 var canvas = document.getElementById('c');
 var help = document.getElementById('h');
 var WEBGL = canvas.getContext('webgl');
-var current_center_x = 0;
-var current_center_y = 0;
+var current_center_x = 0.0;
+var current_center_y = 0.0;
 var current_zoom = 2.0;
 var current_const_x = 0.0, current_const_y = 0.0;
 var current_mouse_x = 0.0, current_mouse_y = 0.0;
@@ -187,9 +187,9 @@ var refresh_canvas = () => {
   WEBGL.uniform1f(param_scale, current_zoom);
   WEBGL.drawArrays(WEBGL.TRIANGLE_STRIP, 0, 4);
   help.innerHTML = [
-      'Center: ' + to_fixed(current_center_x) + ',' + to_fixed(current_center_y),
-      'Constant: ' + to_fixed(current_const_x) + ',' + to_fixed(current_const_y),
-      'Zoom: ' + to_fixed(current_zoom)
+      'Center: ' + to_fixed_width(current_center_x) + ',' + to_fixed_width(current_center_y),
+      'Constant: ' + to_fixed_width(current_const_x) + ',' + to_fixed_width(current_const_y),
+      'Zoom: ' + to_fixed_width(current_zoom)
     ].join('<br/>')
 }
 window.onresize = request_animation_frame;
