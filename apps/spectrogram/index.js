@@ -20,7 +20,6 @@ var init = () => {
   canvas_context.fillStyle = 'black';
   canvas_context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  alert('navigator.mediaDevices.getUserMedia');
   if (navigator.mediaDevices.getUserMedia) {
     var media_success_callback = (stream) => {
       audio_ctx = new AudioContext();
@@ -36,11 +35,8 @@ var init = () => {
     var media_error_callback = (err) => {
       alert(err);
     }
-    alert('navigator.mediaDevices.getUserMedia');
     navigator.mediaDevices.getUserMedia({audio: true}).then(
       media_success_callback, media_error_callback);
-  } else {
-    alert('oopsie!');
   }
 }
 
@@ -74,8 +70,6 @@ var display_scale = (x) => {
 }
 
 var screen_update = () => {
-  alert('update!');
-  return;
   var MAX_CAPTURED_FREQUENCY = audio_ctx.sampleRate/2;
   var midline = CANVAS_HEIGHT/2;
 
