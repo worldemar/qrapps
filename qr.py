@@ -13,10 +13,16 @@ def html_to_url(html_filename, txt_filename):
 
     print(f'HTML src size: {len(html_text)}')
 
+    html_text_escaped = html_text
+
+    # % operator (division reminder) is rarely used in JS
+    # but can still appear and mess up percent-encoding of Data URL.
+    html_text_escaped = html_text_escaped.replace('%', '%' + '25')
+
     # You might think urllib.parse.quote is a better solution,
     # but it escapes too much stuff and bloats data,
     # significantly reducing effective QR capacity
-    html_text_escaped = html_text.replace('#', '%' + '23')
+    html_text_escaped = html_text_escaped.replace('#', '%' + '23')
 
     print(f'HTML rdy size: {len(html_text_escaped)}')
     data_url = 'data:text/html,' + html_text_escaped
