@@ -67,3 +67,11 @@ Loading external shader file is rather difficult to implement within Data URL.
 
 ![demo-shader-julia](demo-shader-julia/qr.png)
 
+### [spectrogram](spectrogram/index.html)
+
+A relatively straightforward implementation of spectrogram.
+The QR for this app might be rather useless, since `mediaDevices`
+are only available for HTTPS for Android devices and not available
+for Data URL on any platform I have available for testing.
+![spectrogram](spectrogram/qr.png)
+
