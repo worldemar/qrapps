@@ -71,7 +71,8 @@ Loading external shader file is rather difficult to implement within Data URL.
 
 A relatively straightforward implementation of spectrogram.
 The QR for this app might be rather useless, since `mediaDevices`
-are only available for HTTPS for Android devices and not available
-for Data URL on any platform I have available for testing.
+are only available for HTTPS on Android devices and not available
+for Data URL on any platform I have available.
+
 ![spectrogram](spectrogram/qr.png)
 
