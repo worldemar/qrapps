@@ -3,7 +3,7 @@ var line_dx1 = 17, line_dy1 = 19;
 var line_x2 = 0, line_y2 = 0;
 var line_dx2 = 17, line_dy2 = 19;
 var frames = 0;
-var canvas_width, canvas_height;
+var CW, CH;
 var body, canvas, ctx;
 
 // all inputs: 0-1
@@ -34,15 +34,15 @@ function HSL2RGB(h, s, l) {
 var init = () => {
   body = document.getElementsByTagName('body')[0];
   canvas = document.getElementsByTagName('canvas')[0];
-  canvas_width = canvas.width = window.innerWidth;
-  canvas_height = canvas.height = window.innerHeight;
-  line_x1 = canvas_width / 3;
+  CW = canvas.width = window.innerWidth;
+  CH = canvas.height = window.innerHeight;
+  line_x1 = CW / 3;
   line_y1 = 1;
   line_x2 = 1;
-  line_y2 = canvas_height / 4;
+  line_y2 = CH / 4;
   ctx = canvas.getContext('2d');
   ctx.fillStyle = 'black';
-  ctx.fillRect(0, 0, canvas_width, canvas_height);
+  ctx.fillRect(0, 0, CW, CH);
 }
 
 var move_coord = (x, dx, edges) => {
@@ -56,39 +56,88 @@ var move_coord = (x, dx, edges) => {
 }
 
 var animate = () => {
-  [line_x1, line_dx1] = move_coord(line_x1, line_dx1, [0, canvas_width]);
-  [line_y1, line_dy1] = move_coord(line_y1, line_dy1, [0, canvas_height]);
-  [line_x2, line_dx2] = move_coord(line_x2, line_dx2, [0, canvas_width]);
-  [line_y2, line_dy2] = move_coord(line_y2, line_dy2, [0, canvas_height]);
+  [line_x1, line_dx1] = move_coord(line_x1, line_dx1, [0, CW]);
+  [line_y1, line_dy1] = move_coord(line_y1, line_dy1, [0, CH]);
+  [line_x2, line_dx2] = move_coord(line_x2, line_dx2, [0, CW]);
+  [line_y2, line_dy2] = move_coord(line_y2, line_dy2, [0, CH]);
   frames++;
+}
+
+var line = (x1, y1, x2, y2) => {
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
 }
 
 var step = () => {
   ctx.fillStyle = '#00000020';
-  ctx.fillRect(0, 0, canvas_width, canvas_height);
+  ctx.fillRect(0, 0, CW, CH);
 
-  var style = 1;
+  var style = 4;
   switch (style) {
     case 0: // single line
       ctx.strokeStyle = HSL2RGB(0.5+Math.sin(frames/600)/2, 0.5+Math.sin(frames/600)/2, 0.5);
       ctx.lineWidth = 5;
       ctx.beginPath();
-      ctx.moveTo(line_x1, line_y1);
-      ctx.lineTo(line_x2, line_y2);
+      line(line_x1, line_y1, line_x2, line_y2);
       ctx.stroke();
       break;
     case 1: // four symmetric lines
       ctx.strokeStyle = HSL2RGB(0.5+Math.sin(frames/600)/2, 0.5+Math.sin(frames/600)/2, 0.5);
       ctx.lineWidth = 5;
       ctx.beginPath();
-      ctx.moveTo(line_x1, line_y1);
-      ctx.lineTo(line_x2, line_y2);
-      ctx.moveTo(canvas_width - line_x1, line_y1);
-      ctx.lineTo(canvas_width - line_x2, line_y2);
-      ctx.moveTo(line_x1, canvas_height - line_y1);
-      ctx.lineTo(line_x2, canvas_height - line_y2);
-      ctx.moveTo(canvas_width - line_x1, canvas_height - line_y1);
-      ctx.lineTo(canvas_width - line_x2, canvas_height - line_y2);
+      line(line_x1, line_y1, line_x2, line_y2);
+      line(CW - line_x1, line_y1, CW - line_x2, line_y2);
+      line(line_x1, CH - line_y1, line_x2, CH - line_y2);
+      line(CW - line_x1, CH - line_y1, CW - line_x2, CH - line_y2);
+      ctx.stroke();
+      break;
+    case 2: // single cross-line
+      ctx.strokeStyle = HSL2RGB(0.5+Math.sin(frames/600)/2, 0.5+Math.sin(frames/600)/2, 0.5);
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      line(line_x1, line_y1, line_x2, line_y2);
+      line(line_x1, line_y2, line_x2, line_y1);
+      ctx.stroke();
+      break;
+    case 3: // four cross-lines
+      ctx.strokeStyle = HSL2RGB(0.5+Math.sin(frames/600)/2, 0.5+Math.sin(frames/600)/2, 0.5);
+      ctx.lineWidth = 5;
+      ctx.beginPath();      
+      line(line_x1     , line_y1     , line_x2     , line_y2);
+      line(CW - line_x1, line_y1     , CW - line_x2, line_y2);
+      line(line_x1     , CH - line_y1, line_x2     , CH - line_y2);
+      line(CW - line_x1, CH - line_y1, CW - line_x2, CH - line_y2);
+      line(line_x1     , line_y2     , line_x2     , line_y1);
+      line(CW - line_x1, line_y2     , CW - line_x2, line_y1);
+      line(line_x1     , CH - line_y2, line_x2     , CH - line_y1);
+      line(CW - line_x1, CH - line_y2, CW - line_x2, CH - line_y1);
+      ctx.stroke();
+      break;
+    case 4: // four cross-lines
+      ctx.strokeStyle = HSL2RGB(0.5+Math.sin(frames/600)/2, 0.5+Math.sin(frames/600)/2, 0.5);
+      ctx.lineWidth = 5;
+      ctx.beginPath();      
+      ctx.rect(line_x1, line_y1, line_x2 - line_x1, line_y2 - line_y1);
+      ctx.stroke();
+      break;
+    case 5: // big square
+      ctx.strokeStyle = HSL2RGB(0.5+Math.sin(frames/600)/2, 0.5+Math.sin(frames/600)/2, 0.5);
+      ctx.lineWidth = (Math.sin(-frames / 100) + 1) * 5 + 5;
+      ctx.beginPath();
+      ctx.rect(line_x1, line_y1, CW - line_x1*2, CH - line_y1*2);
+      ctx.rect(line_x2, line_y2, CW - line_x2*2, CH - line_y2*2);
+      ctx.stroke();
+      break;
+    case 6: // big squares connected
+      ctx.strokeStyle = HSL2RGB(0.5+Math.sin(frames/600)/2, 0.5+Math.sin(frames/600)/2, 0.5);
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      line(line_x1, line_y1, line_x2, line_y2);
+      line(CW - line_x1, line_y1, CW - line_x2, line_y2);
+      line(line_x1, CH - line_y1, line_x2, CH - line_y2);
+      line(CW - line_x1, CH - line_y1, CW - line_x2, CH - line_y2);
+      ctx.rect(line_x1, line_y1, CW - line_x1*2, CH - line_y1*2);
+      ctx.rect(line_x2, line_y2, CW - line_x2*2, CH - line_y2*2);
       ctx.stroke();
       break;
     default:
@@ -96,7 +145,6 @@ var step = () => {
   }
   animate();
   setTimeout(step, 100);
-  //requestAnimationFrame(step);
 }
 
 init();
