@@ -1,10 +1,10 @@
-var line_x1 = 0, line_y1 = 0;
-var line_dx1 = 17, line_dy1 = 19;
-var line_x2 = 0, line_y2 = 0;
-var line_dx2 = 17, line_dy2 = 19;
+var a_x = 0, a_y = 0;
+var a_dx = 17, a_dy = 19;
+var b_x = 0, b_y = 0;
+var b_dx = 17, b_dy = 19;
 var frames = 0;
 var CW, CH;
-var body, canvas, ctx;
+var canvas, ctx;
 
 // all inputs: 0-1
 // all outputs: 0-255
@@ -28,18 +28,16 @@ function HSL2RGB(h, s, l) {
     b = hue2rgb(p, q, h - 1/3);
   }
   return 'rgb('+ (r * 255) + ',' + (g * 255) + ',' +  (b * 255) + ',255)';
-  return [ r * 255, g * 255, b * 255 ];
 }
 
 var init = () => {
-  body = document.getElementsByTagName('body')[0];
   canvas = document.getElementsByTagName('canvas')[0];
   CW = canvas.width = window.innerWidth;
   CH = canvas.height = window.innerHeight;
-  line_x1 = CW / 3;
-  line_y1 = 1;
-  line_x2 = 1;
-  line_y2 = CH / 4;
+  a_x = CW / 3;
+  a_y = 1;
+  b_x = 1;
+  b_y = CH / 4;
   ctx = canvas.getContext('2d');
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, CW, CH);
@@ -56,16 +54,16 @@ var move_coord = (x, dx, edges) => {
 }
 
 var animate = () => {
-  [line_x1, line_dx1] = move_coord(line_x1, line_dx1, [0, CW]);
-  [line_y1, line_dy1] = move_coord(line_y1, line_dy1, [0, CH]);
-  [line_x2, line_dx2] = move_coord(line_x2, line_dx2, [0, CW]);
-  [line_y2, line_dy2] = move_coord(line_y2, line_dy2, [0, CH]);
+  [a_x, a_dx] = move_coord(a_x, a_dx, [0, CW]);
+  [a_y, a_dy] = move_coord(a_y, a_dy, [0, CH]);
+  [b_x, b_dx] = move_coord(b_x, b_dx, [0, CW]);
+  [b_y, b_dy] = move_coord(b_y, b_dy, [0, CH]);
   frames++;
 }
 
-var line = (x1, y1, x2, y2) => {
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
+var line = (a, b) => {
+  ctx.moveTo(a[0], a[1]);
+  ctx.lineTo(b[0], b[1]);
 }
 
 var step = () => {
@@ -81,60 +79,101 @@ var step = () => {
     0.3 + 0.2 * phase
     );
   ctx.beginPath();
+
+  var mirror_h = (D) => { return [ CW - D[0], D[1] ] }
+  var mirror_v = (D) => { return [ D[0], CH - D[1] ] }
+  // top left points
+  var A0 = [a_x, a_y];
+  var B0 = [b_x, b_y];
+  // top right points
+  var A1 = mirror_h(A0)
+  var B1 = mirror_h(B0)
+  // bottom right points
+  var A2 = mirror_v(A1)
+  var B2 = mirror_v(B1)
+  // bottom left points
+  var A3 = mirror_h(A2)
+  var B3 = mirror_h(B2)
+
+  // top left points
+  var A0x = [a_x, b_y];
+  var B0x = [b_x, a_y];
+  // top right points
+  var A1x = mirror_h(A0x)
+  var B1x = mirror_h(B0x)
+  // bottom right points
+  var A2x = mirror_v(A1x)
+  var B2x = mirror_v(B1x)
+  // bottom left points
+  var A3x = mirror_h(A2x)
+  var B3x = mirror_h(B2x)
+
+
   switch (style) {
     case 0: // single line
-      line(line_x1, line_y1, line_x2, line_y2);
+      line(A0, B0);
       break;
     case 1: // four symmetric lines, the classic
-      line(line_x1, line_y1, line_x2, line_y2);
-      line(CW - line_x1, line_y1, CW - line_x2, line_y2);
-      line(line_x1, CH - line_y1, line_x2, CH - line_y2);
-      line(CW - line_x1, CH - line_y1, CW - line_x2, CH - line_y2);
+      line(A0, B0);
+      line(A1, B1);
+      line(A2, B2);
+      line(A3, B3);
       break;
     case 2: // single cross-line
-      line(line_x1, line_y1, line_x2, line_y2);
-      line(line_x1, line_y2, line_x2, line_y1);
+      line(A0, B0);
+      line(A0x, B0x);
       break;
     case 3: // four cross-lines
-      line(line_x1     , line_y1     , line_x2     , line_y2);
-      line(CW - line_x1, line_y1     , CW - line_x2, line_y2);
-      line(line_x1     , CH - line_y1, line_x2     , CH - line_y2);
-      line(CW - line_x1, CH - line_y1, CW - line_x2, CH - line_y2);
-      line(line_x1     , line_y2     , line_x2     , line_y1);
-      line(CW - line_x1, line_y2     , CW - line_x2, line_y1);
-      line(line_x1     , CH - line_y2, line_x2     , CH - line_y1);
-      line(CW - line_x1, CH - line_y2, CW - line_x2, CH - line_y1);
+      line(A0, B0);
+      line(A0x, B0x);
+      line(A1, B1);
+      line(A1x, B1x);
+      line(A2, B2);
+      line(A2x, B2x);
+      line(A3, B3);
+      line(A3x, B3x);
       break;
     case 4: // small square
-      ctx.rect(line_x1, line_y1, line_x2 - line_x1, line_y2 - line_y1);
+      line(A0, B0x);
+      line(B0x, B0);
+      line(B0, A0x);
+      line(A0x, A0);
       break;
     case 5: // big square
-      ctx.rect(line_x1, line_y1, CW - line_x1*2, CH - line_y1*2);
-      ctx.rect(line_x2, line_y2, CW - line_x2*2, CH - line_y2*2);
+      line(A0, A1);
+      line(A1, A2);
+      line(A2, A3);
+      line(A3, A0);
       break;
     case 6: // big squares connected
-      line(line_x1, line_y1, line_x2, line_y2);
-      line(CW - line_x1, line_y1, CW - line_x2, line_y2);
-      line(line_x1, CH - line_y1, line_x2, CH - line_y2);
-      line(CW - line_x1, CH - line_y1, CW - line_x2, CH - line_y2);
-      ctx.rect(line_x1, line_y1, CW - line_x1*2, CH - line_y1*2);
-      ctx.rect(line_x2, line_y2, CW - line_x2*2, CH - line_y2*2);
+      line(A0, B0);
+      line(A1, B1);
+      line(A2, B2);
+      line(A3, B3);
+      line(A0, A1);
+      line(A1, A2);
+      line(A2, A3);
+      line(A3, A0);
+      line(A0x, A1x);
+      line(A1x, A2x);
+      line(A2x, A3x);
+      line(A3x, A0x);
       break;
     case 7: // titled square
-      line(line_x1, line_y1, CW - line_x2, line_y2);
-      line(CW - line_x2, line_y2, CW - line_x1, CH - line_y1);
-      line(CW - line_x1, CH - line_y1, line_x2, CH - line_y2);
-      line(line_x2, CH - line_y2, line_x1, line_y1);
+      line(A0, B1);
+      line(B1, A2);
+      line(A2, B3);
+      line(B3, A0);
       break;
     case 8: // titled squares
-      line(line_x1, line_y1, CW - line_x2, line_y2);
-      line(CW - line_x2, line_y2, CW - line_x1, CH - line_y1);
-      line(CW - line_x1, CH - line_y1, line_x2, CH - line_y2);
-      line(line_x2, CH - line_y2, line_x1, line_y1);
-      line(line_x2, line_y2, CW - line_x1, line_y1);
-      line(CW - line_x1, line_y1, CW - line_x2, CH - line_y2);
-      line(CW - line_x2, CH - line_y2, line_x1, CH - line_y1);
-      line(line_x1, CH - line_y1, line_x2, line_y2);
+      line(A0, B1);
+      line(B1, A2);
+      line(A2, B3);
+      line(B3, A0);
+      line(B0, A1);
+      line(A1, B2);
+      line(B2, A3);
+      line(A3, B0);
       break;
     default:
       break;
