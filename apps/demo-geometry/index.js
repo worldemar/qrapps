@@ -72,7 +72,7 @@ var step = () => {
   ctx.fillStyle = '#00000020';
   ctx.fillRect(0, 0, CW, CH);
 
-  var style = Math.floor(frames / 300) % 7;
+  var style = Math.floor(frames / 300) % 9;
   var phase = (1 - Math.pow(Math.cos(Math.PI * frames / 300), 100));
   ctx.lineWidth = phase * 6 + 0.5;
   ctx.strokeStyle = HSL2RGB(
@@ -119,6 +119,22 @@ var step = () => {
       line(CW - line_x1, CH - line_y1, CW - line_x2, CH - line_y2);
       ctx.rect(line_x1, line_y1, CW - line_x1*2, CH - line_y1*2);
       ctx.rect(line_x2, line_y2, CW - line_x2*2, CH - line_y2*2);
+      break;
+    case 7: // titled square
+      line(line_x1, line_y1, CW - line_x2, line_y2);
+      line(CW - line_x2, line_y2, CW - line_x1, CH - line_y1);
+      line(CW - line_x1, CH - line_y1, line_x2, CH - line_y2);
+      line(line_x2, CH - line_y2, line_x1, line_y1);
+      break;
+    case 8: // titled squares
+      line(line_x1, line_y1, CW - line_x2, line_y2);
+      line(CW - line_x2, line_y2, CW - line_x1, CH - line_y1);
+      line(CW - line_x1, CH - line_y1, line_x2, CH - line_y2);
+      line(line_x2, CH - line_y2, line_x1, line_y1);
+      line(line_x2, line_y2, CW - line_x1, line_y1);
+      line(CW - line_x1, line_y1, CW - line_x2, CH - line_y2);
+      line(CW - line_x2, CH - line_y2, line_x1, CH - line_y1);
+      line(line_x1, CH - line_y1, line_x2, line_y2);
       break;
     default:
       break;
