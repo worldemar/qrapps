@@ -2,9 +2,10 @@ var a_x = 0, a_y = 0;
 var a_dx = 17, a_dy = 19;
 var b_x = 0, b_y = 0;
 var b_dx = 17, b_dy = 19;
-var frames = 0;
+var frames = 1;
 var CW, CH;
 var canvas, ctx;
+var style = 0;
 
 // all inputs: 0-1
 // all outputs: 0-255
@@ -92,43 +93,86 @@ var step = () => {
   var A3x = mirror_h(A2x);
   var B3x = mirror_h(B2x);
 
+  // drawing helpers
+  var s_line_0 = () => { line(A0, B0); }
+  var s_line_1 = () => { line(A1, B1); }
+  var s_line_2 = () => { line(A2, B2); }
+  var s_line_3 = () => { line(A3, B3); }
+  var s_line_0x = () => { line(A0x, B0x); }
+  var s_line_1x = () => { line(A1x, B1x); }
+  var s_line_2x = () => { line(A2x, B2x); }
+  var s_line_3x = () => { line(A3x, B3x); }
+  var s_rect_0 = () => { line(A0, B0x); line(B0x, B0); line(B0, A0x); line(A0x, A0); }
+  var s_rect_1 = () => { line(A1, B1x); line(B1x, B1); line(B1, A1x); line(A1x, A1); }
+  var s_rect_2 = () => { line(A2, B2x); line(B2x, B2); line(B2, A2x); line(A2x, A2); }
+  var s_rect_3 = () => { line(A3, B3x); line(B3x, B3); line(B3, A3x); line(A3x, A3); }
+  var s_rect_A = ()  => { line(A0, A1); line(A1, A2); line(A2, A3); line(A3, A0); }
+  var s_rect_B = ()  => { line(B0, B1); line(B1, B2); line(B2, B3); line(B3, B0); }
+  var s_tilt_A = ()  => { line(A0, B1); line(B1, A2); line(A2, B3); line(B3, A0); }
+  var s_tilt_B = ()  => { line(B0, A1); line(A1, B2); line(B2, A3); line(A3, B0); }
+  
   var styles = [
-    // single line
-    () => { line(A0, B0); },
-    // four symmetric lines, the classic
-    () => { line(A0, B0); line(A1, B1); line(A2, B2); line(A3, B3) },
-    // single cross-line
-    () => { line(A0, B0); line(A0x, B0x) },
-    // four cross-lines
-    () => {
-      line(A0, B0); line(A0x, B0x); line(A1, B1); line(A1x, B1x);
-      line(A2, B2); line(A2x, B2x); line(A3, B3); line(A3x, B3x);
-    },
-    // small square
-    () => { line(A0, B0x); line(B0x, B0); line(B0, A0x); line(A0x, A0); },
-    // big square
-    () => {
-      line(A0, A1); line(A1, A2); line(A2, A3); line(A3, A0);
-    },
-    // big squares connected
-    () => {
-      line(A0, A1); line(A1, A2); line(A2, A3); line(A3, A0);
-      line(A0x, A1x); line(A1x, A2x); line(A2x, A3x); line(A3x, A0x);      
-      line(A0, B0); line(A1, B1); line(A2, B2); line(A3, B3);
-    },
-    // titled square
-    () => { line(A0, B1); line(B1, A2); line(A2, B3); line(B3, A0); },
-    // titled squares
-    () => {
-      line(A0, B1); line(B1, A2); line(A2, B3); line(B3, A0);
-      line(B0, A1); line(A1, B2); line(B2, A3); line(A3, B0);
-    },
-  ];
+    // 0 : just 1 line
+    [ s_line_0 ],
+    // 1 : 1 line with center symmetry
+    [ s_line_0, s_line_2 ],
+    // 2 : 4 lines with center symmetry
+    [ s_line_0, s_line_1, s_line_2, s_line_3 ],
+    // 3 : 1 line as X
+    [ s_line_0, s_line_0x ],
+    // 4 : two symmetric lines as X
+    [ s_line_0, s_line_0x, s_line_2, s_line_2x ],
+    // 5 : 1 line and its center-symmetrical X-line
+    [ s_line_0, s_line_2x ],
+    // 6 : 4 symmetric lines as X
+    [ s_line_0, s_line_0x, s_line_1, s_line_1x, s_line_2, s_line_2x, s_line_3, s_line_3x ],
+    // 7 : 1 small rect
+    [ s_rect_0 ],
+    // 8 : 2 symmetric small rects
+    [ s_rect_0, s_rect_2 ],
+    // 9 : 4 symmetric small rects
+    [ s_rect_0, s_rect_1, s_rect_2, s_rect_3 ],
+    //10 : 1 big rect on A points
+    [ s_rect_A ],
+    //11 : 1 big rect on B points
+    [ s_rect_B ],
+    //12 : 2 big rects on A and B points
+    [ s_rect_A, s_rect_B ],
+    //13 : 2 big rects on A and B points connected with all 4 lines
+    [ s_rect_A, s_rect_B, s_line_0, s_line_1, s_line_2, s_line_3 ],
+    //14 : 1 big slanted rect starting on A
+    [ s_tilt_A ],
+    //15 : 1 big slanted rect starting on B
+    [ s_tilt_B ],
+    //16 : 2 big slanted rects starting on A and B
+    [ s_tilt_A, s_tilt_B ],
+    //17 : 2 big slanted rects starting on A and B connected with all 4 lines
+    [ s_tilt_A, s_tilt_B, s_line_0, s_line_1, s_line_2, s_line_3 ],
+  ]
+
+  var transitions = {
+    0 : [   1,    3,    5,    7,                              ],
+    1 : [0,    2, 3, 4, 5,                                    ],
+    2 : [   1,       4,    6,       9,10,11,   13,14,15,   17,],
+    3 : [0, 1,       4, 5,    7,                              ],
+    4 : [   1, 2, 3,    5, 6,    8, 9,                        ],
+    5 : [0, 1,    3, 4,          8,                           ],
+    6 : [      2,    4,          8, 9,10,11,   13,14,15,   17,],
+    7 : [0,       3,             8,                           ],
+    8 : [            4, 5, 6, 7,    9,                        ],
+    9 : [      2,    4,    6,    8,   10,11,12,13,14,15,   17,],
+    10: [      2,          6,       9,   11,12,   14,15,      ],
+    11: [      2,          6,       9,10,   12,   14,15,      ],
+    12: [                           9,10,11,   13,         17,],
+    13: [      2,          6,       9,      12,            17,],
+    14: [      2,          6,       9,10,11,         15,      ],
+    15: [      2,          6,       9,10,11,      14,   16,   ],
+    16: [                                            15,   17,],
+    17: [      2,          6,       9,      12,13,      16,   ]
+  }
 
   ctx.fillStyle = '#00000020';
   ctx.fillRect(0, 0, CW, CH);
-
-  var style = Math.floor(frames / 300) % styles.length;
   var phase = (1 - Math.pow(Math.cos(Math.PI * frames / 300), 100));
   ctx.lineWidth = phase * 6 + 0.5;
   ctx.strokeStyle = HSL2RGB(
@@ -137,10 +181,15 @@ var step = () => {
     0.3 + 0.2 * phase
     );
   ctx.beginPath();
-  styles[style]();
+  styles[style].forEach(f => { f(); });
   ctx.stroke();
+
+  if (phase < 0.001) {
+    style = transitions[style][Math.floor(Math.random() * transitions[style].length)]
+  }
+
   animate();
-  setTimeout(step, 100);
+  setTimeout(step, 50);
 }
 
 init();
