@@ -61,27 +61,11 @@ var animate = () => {
   frames++;
 }
 
-var line = (a, b) => {
-  ctx.moveTo(a[0], a[1]);
-  ctx.lineTo(b[0], b[1]);
-}
+var mirror_h = (D) => { return [ CW - D[0], D[1] ] }
+var mirror_v = (D) => { return [ D[0], CH - D[1] ] }
+var line = (a, b) => { ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); };
 
 var step = () => {
-  ctx.fillStyle = '#00000020';
-  ctx.fillRect(0, 0, CW, CH);
-
-  var style = Math.floor(frames / 300) % 9;
-  var phase = (1 - Math.pow(Math.cos(Math.PI * frames / 300), 100));
-  ctx.lineWidth = phase * 6 + 0.5;
-  ctx.strokeStyle = HSL2RGB(
-    0.5 + Math.sin(Math.PI * frames / 600)/2,
-    0.5 + Math.sin(Math.PI * frames / 100)/2,
-    0.3 + 0.2 * phase
-    );
-  ctx.beginPath();
-
-  var mirror_h = (D) => { return [ CW - D[0], D[1] ] }
-  var mirror_v = (D) => { return [ D[0], CH - D[1] ] }
   // top left points
   var A0 = [a_x, a_y];
   var B0 = [b_x, b_y];
@@ -99,85 +83,61 @@ var step = () => {
   var A0x = [a_x, b_y];
   var B0x = [b_x, a_y];
   // top right points
-  var A1x = mirror_h(A0x)
-  var B1x = mirror_h(B0x)
+  var A1x = mirror_h(A0x);
+  var B1x = mirror_h(B0x);
   // bottom right points
-  var A2x = mirror_v(A1x)
-  var B2x = mirror_v(B1x)
+  var A2x = mirror_v(A1x);
+  var B2x = mirror_v(B1x);
   // bottom left points
-  var A3x = mirror_h(A2x)
-  var B3x = mirror_h(B2x)
+  var A3x = mirror_h(A2x);
+  var B3x = mirror_h(B2x);
 
+  var styles = [
+    // single line
+    () => { line(A0, B0); },
+    // four symmetric lines, the classic
+    () => { line(A0, B0); line(A1, B1); line(A2, B2); line(A3, B3) },
+    // single cross-line
+    () => { line(A0, B0); line(A0x, B0x) },
+    // four cross-lines
+    () => {
+      line(A0, B0); line(A0x, B0x); line(A1, B1); line(A1x, B1x);
+      line(A2, B2); line(A2x, B2x); line(A3, B3); line(A3x, B3x);
+    },
+    // small square
+    () => { line(A0, B0x); line(B0x, B0); line(B0, A0x); line(A0x, A0); },
+    // big square
+    () => {
+      line(A0, A1); line(A1, A2); line(A2, A3); line(A3, A0);
+    },
+    // big squares connected
+    () => {
+      line(A0, A1); line(A1, A2); line(A2, A3); line(A3, A0);
+      line(A0x, A1x); line(A1x, A2x); line(A2x, A3x); line(A3x, A0x);      
+      line(A0, B0); line(A1, B1); line(A2, B2); line(A3, B3);
+    },
+    // titled square
+    () => { line(A0, B1); line(B1, A2); line(A2, B3); line(B3, A0); },
+    // titled squares
+    () => {
+      line(A0, B1); line(B1, A2); line(A2, B3); line(B3, A0);
+      line(B0, A1); line(A1, B2); line(B2, A3); line(A3, B0);
+    },
+  ];
 
-  switch (style) {
-    case 0: // single line
-      line(A0, B0);
-      break;
-    case 1: // four symmetric lines, the classic
-      line(A0, B0);
-      line(A1, B1);
-      line(A2, B2);
-      line(A3, B3);
-      break;
-    case 2: // single cross-line
-      line(A0, B0);
-      line(A0x, B0x);
-      break;
-    case 3: // four cross-lines
-      line(A0, B0);
-      line(A0x, B0x);
-      line(A1, B1);
-      line(A1x, B1x);
-      line(A2, B2);
-      line(A2x, B2x);
-      line(A3, B3);
-      line(A3x, B3x);
-      break;
-    case 4: // small square
-      line(A0, B0x);
-      line(B0x, B0);
-      line(B0, A0x);
-      line(A0x, A0);
-      break;
-    case 5: // big square
-      line(A0, A1);
-      line(A1, A2);
-      line(A2, A3);
-      line(A3, A0);
-      break;
-    case 6: // big squares connected
-      line(A0, B0);
-      line(A1, B1);
-      line(A2, B2);
-      line(A3, B3);
-      line(A0, A1);
-      line(A1, A2);
-      line(A2, A3);
-      line(A3, A0);
-      line(A0x, A1x);
-      line(A1x, A2x);
-      line(A2x, A3x);
-      line(A3x, A0x);
-      break;
-    case 7: // titled square
-      line(A0, B1);
-      line(B1, A2);
-      line(A2, B3);
-      line(B3, A0);
-      break;
-    case 8: // titled squares
-      line(A0, B1);
-      line(B1, A2);
-      line(A2, B3);
-      line(B3, A0);
-      line(B0, A1);
-      line(A1, B2);
-      line(B2, A3);
-      line(A3, B0);
-      break;
-    default:
-      break;
-  }
+  ctx.fillStyle = '#00000020';
+  ctx.fillRect(0, 0, CW, CH);
+
+  var style = Math.floor(frames / 300) % styles.length;
+  var phase = (1 - Math.pow(Math.cos(Math.PI * frames / 300), 100));
+  ctx.lineWidth = phase * 6 + 0.5;
+  ctx.strokeStyle = HSL2RGB(
+    0.5 + Math.sin(Math.PI * frames / 600)/2,
+    0.5 + Math.sin(Math.PI * frames / 100)/2,
+    0.3 + 0.2 * phase
+    );
+  ctx.beginPath();
+  styles[style]();
   ctx.stroke();
   animate();
   setTimeout(step, 100);
