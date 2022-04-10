@@ -38,6 +38,11 @@ Simplest demo showcasing proof-of-concept.
 
 ![demo-clock](demo-clock/qr.png)
 
+### [demo-geometry](demo-geometry/index.html)
+
+Geometry demo inspired by old ZX Spectrum demoscene.
+![demo-geometry](demo-geometry/qr.png)
+
 ### [demo-glcube](demo-glcube/index.html)
 
 Simple demo showcasing rotating cube using WebGL.
