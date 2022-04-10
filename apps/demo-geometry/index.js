@@ -6,6 +6,7 @@ var frames = 1;
 var CW, CH;
 var canvas, ctx;
 var style = 0;
+var last_styles = [0];
 
 // all inputs: 0-1
 // all outputs: 0-255
@@ -185,7 +186,24 @@ var step = () => {
   ctx.stroke();
 
   if (phase < 0.001) {
-    style = transitions[style][Math.floor(Math.random() * transitions[style].length)]
+    var pick_new_style = () => {
+      return transitions[style][Math.floor(Math.random() * transitions[style].length)];
+    }
+    var new_style = pick_new_style();
+    var attempts = 0;
+    while (last_styles.includes(new_style) && attempts < 1000) {
+      attempts++;
+      new_style = pick_new_style();
+    }
+    if (attempts > 999) {
+      console.log('forced to go with style=' + new_style);
+    }
+    style = new_style;
+    last_styles.push(style);
+    while (last_styles.length > 15) {
+      last_styles.shift();
+    }
+    console.log(last_styles);
   }
 
   animate();
