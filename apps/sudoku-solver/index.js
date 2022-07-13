@@ -1,38 +1,38 @@
 var cell_values = []
 
 var button_click = (x, y, value) => {
-  cell_values[x-1][y-1] = value
+  cell_values[x][y] = value
   render_cells()
 }
 
 var possible_values = (x, y) => {
   new_values = [1,2,3,4,5,6,7,8,9]
   // rows must have unique values
-  for (var xi = 1; xi <= 9; xi++) {
+  for (var xi = 0; xi < 9; xi++) {
     if (xi == x) {
       continue
     }
-    var index = new_values.indexOf(cell_values[xi-1][y-1]);
+    var index = new_values.indexOf(cell_values[xi][y]);
     if (index > -1) {
       new_values.splice(index, 1);
     }
   }
   // columns must have unique values
-  for (var yi = 1; yi <= 9; yi++) {
+  for (var yi = 0; yi < 9; yi++) {
     if (yi == y) {
       continue
     }
-    var index = new_values.indexOf(cell_values[x-1][yi-1]);
+    var index = new_values.indexOf(cell_values[x][yi]);
     if (index > -1) {
       new_values.splice(index, 1);
     }
   }
   // quadrants must have unique values
-  var qx = (x-1) - (x-1) % 3
-  var qy = (y-1) - (y-1) % 3
+  var qx = x - x % 3
+  var qy = y - y % 3
   for (var xi = qx; xi < qx+3; xi++) {
     for (var yi = qy; yi < qy+3; yi++) {
-      if (xi == x-1 && yi == y-1) {
+      if (xi == x && yi == y) {
         continue
       }
       var index = new_values.indexOf(cell_values[xi][yi]);
@@ -49,8 +49,8 @@ var button_txt = (x, y, c, i, d, s) => {
 }
 
 var render_cells = () => {
-  for (var x = 1; x <= 9; x++) {
-    for (var y = 1; y <= 9; y++) {
+  for (var x = 0; x < 9; x++) {
+    for (var y = 0; y < 9; y++) {
       render_cell(x, y)
     }
   }
@@ -58,7 +58,7 @@ var render_cells = () => {
 
 var render_cell = (x, y) => {
   var cell = document.getElementById('c' + x + y)
-  var the_value = cell_values[x-1][y-1]
+  var the_value = cell_values[x][y]
   if (the_value != 0) {
     cell.innerHTML = button_txt(x, y, 'large', 0, false, the_value)
   } else {
@@ -80,9 +80,9 @@ var fill_document = () => {
     for (var indemx = 0; indemx < 3; indemx++) {
       table += '<td>'
       table += '<table cellpadding=4>'
-      for (var indey = 1; indey <= 3; indey++) {
+      for (var indey = 0; indey < 3; indey++) {
         table += '<tr>'
-        for (var index = 1; index <= 3; index++) {
+        for (var index = 0; index < 3; index++) {
           var indexx = indemx * 3 + index
           var indeyy = indemy * 3 + indey
           table += '<td class=cell id="c' + indexx + indeyy + '"></td>'
