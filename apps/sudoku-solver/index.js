@@ -112,15 +112,7 @@ fill_array = () => {
 var init = () => {
   fill_document()
   fill_array()
-  cell_values[2][3] = 3
-  cell_values[3][2] = 2
-  cell_values[5][5] = 5
   render_cells()
 }
 
-var step = () => {
-  requestAnimationFrame(step);
-}
-
 init();
-step();
