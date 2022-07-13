@@ -1,0 +1,1 @@
+Simple sudoku solving helper. Checks for basic sudoku rules, does not apply any advanced solving techniques.
