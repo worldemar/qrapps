@@ -18,6 +18,9 @@ button {
 
 button.single {
     font-weight: bold;
+    background-color: lime;
+    border: 1px solid black;
+    border-radius: 2px;
 }
 
 button.large {
