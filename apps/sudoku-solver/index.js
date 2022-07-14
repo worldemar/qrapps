@@ -110,8 +110,8 @@ var fill_document = () => {
   table += '</table>'
   document.getElementsByTagName('body')[0].innerHTML = '<button class=single>X</button> - one option left&nbsp;'
   document.getElementsByTagName('body')[0].innerHTML += '<button class=double>Y</button> - two options left&nbsp;'
-  document.getElementsByTagName('body')[0].innerHTML += '<button onclick="lock()">Freeze resolved values</button>'
-  document.getElementsByTagName('body')[0].innerHTML += '<button onclick="btn_clear()">Clear solution</button>'
+  document.getElementsByTagName('body')[0].innerHTML += '<button onclick="lock()">Freeze resolved values</button>&nbsp;'
+  document.getElementsByTagName('body')[0].innerHTML += '<button onclick="btn_clear()">Clear solution</button>&nbsp;'
   document.getElementsByTagName('body')[0].innerHTML += '<p>' + table + '</p>'
 }
 
