@@ -10,7 +10,7 @@ table {
     border-spacing: 0px;
 }
 
-button {
+button.board {
     width: 24px;
     height: 24px;
     font-size: 16px;
@@ -19,6 +19,13 @@ button {
 button.single {
     font-weight: bold;
     background-color: lime;
+    border: 1px solid black;
+    border-radius: 2px;
+}
+
+button.double {
+    font-weight: bold;
+    background-color: cyan;
     border: 1px solid black;
     border-radius: 2px;
 }

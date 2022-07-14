@@ -1,7 +1,13 @@
+var cell_locked_values = []
 var cell_values = []
 
 var button_click = (x, y, value) => {
   cell_values[x][y] = value
+  render_cells()
+}
+
+var lock = () => {
+  cell_locked_values = JSON.parse(JSON.stringify(cell_values));
   render_cells()
 }
 
@@ -45,7 +51,7 @@ var possible_values = (x, y) => {
 }
 
 var button_txt = (x, y, c, i, d, s) => {
-  return '<button class=' + c + ' onclick="button_click(' + x + ',' + y + ',' + i + ')" type=button ' + (d ? 'disabled' : '') + '>' + s + '</button>'
+  return '<button class="' + c + '" onclick="button_click(' + x + ',' + y + ',' + i + ')" type=button ' + (d ? 'disabled' : '') + '>' + s + '</button>'
 }
 
 var render_cells = () => {
@@ -58,15 +64,18 @@ var render_cells = () => {
 
 var render_cell = (x, y) => {
   var cell = document.getElementById('c' + x + y)
-  var the_value = cell_values[x][y]
-  if (the_value != 0) {
-    cell.innerHTML = button_txt(x, y, 'large', 0, false, the_value)
+  if (cell_locked_values[x][y] != 0) {
+    console.log(cell_locked_values)
+    cell.innerHTML = button_txt(x, y, 'large', 0, true, cell_locked_values[x][y])
+  } else if (cell_values[x][y] != 0) {
+    cell.innerHTML = button_txt(x, y, 'large', 0, false, cell_values[x][y])
   } else {
     var pv = possible_values(x, y)
     cell.innerHTML = ''
     for (var i = 1; i <= 9; i++) {
       var disabled = pv.includes(i) ? '' : 'disabled'
-      cell.innerHTML += button_txt(x, y, pv.length == 1 && pv.includes(i) ? 'single' : 'small', i, !pv.includes(i), i)
+      var classname = 'board '+ (pv.includes(i) ? ['single', 'double'][pv.length - 1] : '')
+      cell.innerHTML += button_txt(x, y, classname, i, !pv.includes(i), i)
       cell.innerHTML += i % 3 == 0 ? '<br/>' : ''
     }
   }
@@ -95,7 +104,10 @@ var fill_document = () => {
     table += '</tr>'
   }
   table += '</table>'
-  document.getElementsByTagName('body')[0].innerHTML=table
+  document.getElementsByTagName('body')[0].innerHTML = '<button class=single>X</button> - one option left&nbsp;'
+  document.getElementsByTagName('body')[0].innerHTML += '<button class=double>Y</button> - two options left&nbsp;'
+  document.getElementsByTagName('body')[0].innerHTML += '<button onclick="lock()">Freeze resolved values</button>'
+  document.getElementsByTagName('body')[0].innerHTML += '<p>' + table + '</p>'
 }
 
 fill_array = () => {
@@ -105,6 +117,7 @@ fill_array = () => {
       cell_values[x].push(0)
     }
   }
+  lock()
 }
 
 
