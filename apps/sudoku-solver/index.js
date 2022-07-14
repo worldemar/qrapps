@@ -71,12 +71,16 @@ var render_cell = (x, y) => {
     cell.innerHTML = button_txt(x, y, 'large', 0, false, cell_values[x][y])
   } else {
     var pv = possible_values(x, y)
-    cell.innerHTML = ''
-    for (var i = 1; i <= 9; i++) {
-      var disabled = pv.includes(i) ? '' : 'disabled'
-      var classname = 'board '+ (pv.includes(i) ? ['single', 'double'][pv.length - 1] : '')
-      cell.innerHTML += button_txt(x, y, classname, i, !pv.includes(i), i)
-      cell.innerHTML += i % 3 == 0 ? '<br/>' : ''
+    if (pv.length == 0) {
+      cell.innerHTML = button_txt(x, y, 'error', 0, true, 'X')
+    } else {
+      cell.innerHTML = ''
+      for (var i = 1; i <= 9; i++) {
+        var disabled = pv.includes(i) ? '' : 'disabled'
+        var classname = 'board '+ (pv.includes(i) ? ['single', 'double'][pv.length - 1] : '')
+        cell.innerHTML += button_txt(x, y, classname, i, !pv.includes(i), i)
+        cell.innerHTML += i % 3 == 0 ? '<br/>' : ''
+      }
     }
   }
 }
@@ -107,24 +111,28 @@ var fill_document = () => {
   document.getElementsByTagName('body')[0].innerHTML = '<button class=single>X</button> - one option left&nbsp;'
   document.getElementsByTagName('body')[0].innerHTML += '<button class=double>Y</button> - two options left&nbsp;'
   document.getElementsByTagName('body')[0].innerHTML += '<button onclick="lock()">Freeze resolved values</button>'
+  document.getElementsByTagName('body')[0].innerHTML += '<button onclick="btn_clear()">Clear solution</button>'
   document.getElementsByTagName('body')[0].innerHTML += '<p>' + table + '</p>'
 }
 
-fill_array = () => {
+btn_clear = () => {
+  cell_values = JSON.parse(JSON.stringify(cell_locked_values));
+  render_cells()
+}
+
+clear_board = () => {
   for (var x = 0; x < 9; x++) {
     cell_values.push([])
     for (var y = 0; y < 9; y++) {
       cell_values[x].push(0)
     }
   }
-  lock()
 }
-
-
 
 var init = () => {
   fill_document()
-  fill_array()
+  clear_board()
+  lock()
   render_cells()
 }
 
