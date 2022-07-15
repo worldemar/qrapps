@@ -1,7 +1,5 @@
-canvas {
-    left: 0px;
-    top: 0px;
-    position: absolute;
+body {
+    font-family: sans;
 }
 
 table {

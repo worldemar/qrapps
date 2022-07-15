@@ -1,17 +1,17 @@
 var cell_locked_values = []
-var cell_values = []
+var cell_selected_values = []
 
 var button_click = (x, y, value) => {
-  cell_values[x][y] = value
+  cell_selected_values[x][y] = value
   render_cells()
 }
 
 var lock = () => {
-  cell_locked_values = JSON.parse(JSON.stringify(cell_values));
+  cell_locked_values = JSON.parse(JSON.stringify(cell_selected_values));
   render_cells()
 }
 
-var possible_values = (x, y) => {
+var possible_values = (cell_values, x, y) => {
   new_values = [1,2,3,4,5,6,7,8,9]
   // rows must have unique values
   for (var xi = 0; xi < 9; xi++) {
@@ -65,12 +65,11 @@ var render_cells = () => {
 var render_cell = (x, y) => {
   var cell = document.getElementById('c' + x + y)
   if (cell_locked_values[x][y] != 0) {
-    console.log(cell_locked_values)
     cell.innerHTML = button_txt(x, y, 'large', 0, true, cell_locked_values[x][y])
-  } else if (cell_values[x][y] != 0) {
-    cell.innerHTML = button_txt(x, y, 'large', 0, false, cell_values[x][y])
+  } else if (cell_selected_values[x][y] != 0) {
+    cell.innerHTML = button_txt(x, y, 'large', 0, false, cell_selected_values[x][y])
   } else {
-    var pv = possible_values(x, y)
+    var pv = possible_values(cell_selected_values, x, y)
     if (pv.length == 0) {
       cell.innerHTML = button_txt(x, y, 'error', 0, true, 'X')
     } else {
@@ -116,15 +115,15 @@ var fill_document = () => {
 }
 
 btn_clear = () => {
-  cell_values = JSON.parse(JSON.stringify(cell_locked_values));
+  cell_selected_values = JSON.parse(JSON.stringify(cell_locked_values));
   render_cells()
 }
 
 clear_board = () => {
   for (var x = 0; x < 9; x++) {
-    cell_values.push([])
+    cell_selected_values.push([])
     for (var y = 0; y < 9; y++) {
-      cell_values[x].push(0)
+      cell_selected_values[x].push(0)
     }
   }
 }
