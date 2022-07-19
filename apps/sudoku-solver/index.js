@@ -34,7 +34,7 @@ var board_clear = () => {
   board_explanations = copy(EMPTY_BOARD_L)
 }
 
-var possible_values = (x, y) => {
+var possible_values_basic = (x, y) => {
   new_values = [1,2,3,4,5,6,7,8,9]
   explanations = []
   // quadrants must have unique values
@@ -77,12 +77,41 @@ var possible_values = (x, y) => {
       explanations.push(board_value + ' already in column (' + i + ')')
     }
   }
+  return {new_values, explanations}
+}
+
+var possible_values_set = (x, y) => {
+  var {new_values, explanations} = possible_values_basic(x, y)
+  // quadrants must not have more sets of new_values that it's length
+  // otherwise there is no way to spread all values to them
+  var same_sets = 1
+  var qx = x - x % 3
+  var qy = y - y % 3
+  for (var j = qy; j < qy+3; j++) {
+    for (var i = qx; i < qx+3; i++) {
+      if (i == x && j == y) {
+        continue
+      }
+      var nv = possible_values_basic(i, j)
+      if (Array.isArray(nv.new_values)) {
+        if (JSON.stringify(nv.new_values) == JSON.stringify(new_values)) {
+          same_sets += 1
+          console.log(same_sets)
+        }
+      }
+    }
+  }
+  if (same_sets > new_values.length) {
+    explanations.push(JSON.stringify(new_values) + ' in quadrant ' + same_sets + ' times')
+    new_values = []
+  }
+
   explanations.sort()
   return {new_values, explanations}
 }
 
-var button_txt = (x, y, c, i, d, s) => {
-  return '<button title="' + board_explanations[x][y].join('\n') + '" class="' + c + '" onclick="button_click(' + x + ',' + y + ',' + i + ')" type=button ' + (d ? 'disabled' : '') + '>' + s + '</button>'
+var button_txt = (x, y, c, i, d, s, e) => {
+  return '<button title="' + e.join('\n') + '" class="' + c + '" onclick="button_click(' + x + ',' + y + ',' + i + ')" type=button ' + (d ? 'disabled' : '') + '>' + s + '</button>'
 }
 
 var render_cells = () => {
@@ -96,18 +125,18 @@ var render_cells = () => {
 var render_cell = (x, y) => {
   var cell = document.getElementById('c' + x + y)
   if (board_locked_values[x][y] != 0) {
-    cell.innerHTML = button_txt(x, y, 'large', 0, true, board_locked_values[x][y])
+    cell.innerHTML = button_txt(x, y, 'large', 0, true, board_locked_values[x][y], [])
   } else if (board_selected_values[x][y] != 0) {
-    cell.innerHTML = button_txt(x, y, 'large', 0, false, board_selected_values[x][y])
+    cell.innerHTML = button_txt(x, y, 'large', 0, false, board_selected_values[x][y], [])
   } else {
-    var pv = board_possible_values[x][y]
-    if (pv.length == 0) {
-      cell.innerHTML = button_txt(x, y, 'error', 0, true, 'X')
+    var {new_values, explanations} = possible_values_set(x, y) // board_possible_values[x][y]
+    if (new_values.length == 0) {
+      cell.innerHTML = button_txt(x, y, 'error', 0, true, 'X', explanations)
     } else {
       var new_html = ''
       for (var i = 1; i <= 9; i++) {
-        var classname = 'board '+ (pv.includes(i) ? ['single', 'double'][pv.length - 1] : '')
-        new_html += button_txt(x, y, classname, i, !pv.includes(i), i)
+        var classname = 'board '+ (new_values.includes(i) ? ['single', 'double'][new_values.length - 1] : [])
+        new_html += button_txt(x, y, classname, i, !new_values.includes(i), i, explanations)
         new_html += i % 3 == 0 ? '<br/>' : ''
       }
       cell.innerHTML = new_html
@@ -147,40 +176,38 @@ var fill_document = () => {
 
 var btn_lock = () => {
   board_lock()
-  timeout_func()
+  render_cells()
 }
 
 var btn_clear = () => {
   board_clear()
-  timeout_func()
+  render_cells()
 }
 
 var button_click = (x, y, value) => {
   board_selected_values[x][y] = value
-  timeout_func()
-}
-
-var board_solve_step = () => {
-  var changes = 0
-  for (var y = 0; y < 9; y++) {
-    for (var x = 0; x < 9; x++) {
-      var {new_values, explanations} = possible_values(x, y)
-      changes += JSON.stringify(board_possible_values[x][y]) != JSON.stringify(new_values)
-      board_possible_values[x][y] = new_values
-      board_explanations[x][y] = explanations
-    }
-  }
-  console.log(changes)
-  return changes
-}
-
-var timeout_func = () => {
-  var attempts = 100
-  while (attempts > 0 && board_solve_step() > 0) {
-    attempts -= 1
-  }
   render_cells()
 }
 
+// var board_solve = () => {
+//   var changes = 0
+//   for (var y = 0; y < 9; y++) {
+//     for (var x = 0; x < 9; x++) {
+//       var {new_values, explanations} = possible_values_set(x, y)
+//       changes += JSON.stringify(board_possible_values[x][y]) != JSON.stringify(new_values)
+//       board_possible_values[x][y] = new_values
+//       board_explanations[x][y] = explanations
+//     }
+//   }
+//   console.log(changes)
+//   return changes
+// }
+
+// var timeout_func = () => {
+//   board_solve()
+//   render_cells()
+// }
+
 fill_document()
-timeout_func()
+render_cells()
+// timeout_func()
