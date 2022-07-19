@@ -1,6 +1,9 @@
 var ROW_0 = [0,0,0,0,0,0,0,0,0]
 var EMPTY_BOARD_0 = [ROW_0,ROW_0,ROW_0,ROW_0,ROW_0,ROW_0,ROW_0,ROW_0,ROW_0]
+var CELL_9 = [1,2,3,4,5,6,7,8,9]
 var ROW_L = [[],[],[],[],[],[],[],[],[]]
+var ROW_9 = [CELL_9,CELL_9,CELL_9,CELL_9,CELL_9,CELL_9,CELL_9,CELL_9,CELL_9]
+var EMPTY_BOARD_9 = [ROW_9,ROW_9,ROW_9,ROW_9,ROW_9,ROW_9,ROW_9,ROW_9,ROW_9]
 var EMPTY_BOARD_L = [ROW_L,ROW_L,ROW_L,ROW_L,ROW_L,ROW_L,ROW_L,ROW_L,ROW_L]
 var copy = (x) => {
   return JSON.parse(JSON.stringify(x))
@@ -8,7 +11,7 @@ var copy = (x) => {
 
 var board_locked_values = copy(EMPTY_BOARD_0)
 var board_selected_values = copy(EMPTY_BOARD_0)
-var board_possible_values = copy(EMPTY_BOARD_L)
+var board_possible_values = copy(EMPTY_BOARD_9)
 var board_explanations = copy(EMPTY_BOARD_L)
 
 var board_get_value = (x, y) => {
@@ -18,8 +21,8 @@ var board_get_value = (x, y) => {
   if (board_selected_values[x][y] != 0) {
     return board_selected_values[x][y]
   }
-  if (board_possible_values[x][y].length != 0) {
-    return board_possible_values[x][y]
+  if (board_possible_values[x][y].length == 1) {
+    return board_possible_values[x][y][0]
   }
   return null
 }
@@ -34,9 +37,24 @@ var board_clear = () => {
   board_explanations = copy(EMPTY_BOARD_L)
 }
 
-var possible_values_basic = (x, y) => {
-  new_values = [1,2,3,4,5,6,7,8,9]
-  explanations = []
+
+
+var solve_reset = () => {
+  board_possible_values = copy(EMPTY_BOARD_9)
+  board_explanations = copy(EMPTY_BOARD_L)
+}
+
+var solve_board = () => {
+  for (var y = 0; y < 9; y++) {
+    for (var x = 0; x < 9; x++) {
+      solve_quadrant_for_cell(x,y)
+      solve_row_for_cell(x,y)
+      solve_column_for_cell(x,y)
+    }
+  }
+}
+
+var solve_quadrant_for_cell = (x, y) => {
   // quadrants must have unique values
   var qx = x - x % 3
   var qy = y - y % 3
@@ -46,38 +64,43 @@ var possible_values_basic = (x, y) => {
         continue
       }
       var board_value = board_get_value(i,j)
-      var index = new_values.indexOf(board_value)
+      var index = board_possible_values[x][y].indexOf(board_value)
       if (index > -1) {
-        new_values.splice(index, 1)
-        explanations.push(board_value + ' already in quadrant')
+        board_possible_values[x][y].splice(index, 1)
+        board_explanations[x][y].push(board_value + ' already in quadrant')
       }
     }
   }
+}
+
+var solve_row_for_cell = (x, y) => {
   // rows must have unique values
   for (var i = 0; i < 9; i++) {
     if (i == x) {
       continue
     }
     var board_value = board_get_value(i,y)
-    var index = new_values.indexOf(board_value)
+    var index = board_possible_values[x][y].indexOf(board_value)
     if (index > -1) {
-      new_values.splice(index, 1);
-      explanations.push(board_value + ' already in row (' + i + ')')
+      board_possible_values[x][y].splice(index, 1);
+      board_explanations[x][y].push(board_value + ' already in row (' + i + ')')
     }
   }
+}
+
+var solve_column_for_cell = (x, y) => {
   // columns must have unique values
   for (var i = 0; i < 9; i++) {
     if (i == y) {
       continue
     }
     var board_value = board_get_value(x,i)
-    var index = new_values.indexOf(board_value)
+    var index = board_possible_values[x][y].indexOf(board_value)
     if (index > -1) {
-      new_values.splice(index, 1)
-      explanations.push(board_value + ' already in column (' + i + ')')
+      board_possible_values[x][y].splice(index, 1)
+      board_explanations[x][y].push(board_value + ' already in column (' + i + ')')
     }
   }
-  return {new_values, explanations}
 }
 
 var possible_values_set = (x, y) => {
@@ -182,30 +205,22 @@ var btn_lock = () => {
 
 var btn_clear = () => {
   board_clear()
+  solve_reset()
   solve_board()
   render_cells()
 }
 
 var button_click = (x, y, value) => {
   board_selected_values[x][y] = value
+  solve_reset()
   solve_board()
   render_cells()
-}
-
-var solve_board = () => {
-  for (var y = 0; y < 9; y++) {
-    for (var x = 0; x < 9; x++) {
-      var {new_values, explanations} = possible_values_basic(x, y)
-      board_possible_values[x][y] = new_values
-      board_explanations[x][y] = explanations
-    }
-  }
 }
 
 var repeat = () => {
   solve_board()
   render_cells()
-  setTimeout(render, 1000)
+  setTimeout(repeat, 1000)
 }
 
 fill_document()
