@@ -189,25 +189,5 @@ var button_click = (x, y, value) => {
   render_cells()
 }
 
-// var board_solve = () => {
-//   var changes = 0
-//   for (var y = 0; y < 9; y++) {
-//     for (var x = 0; x < 9; x++) {
-//       var {new_values, explanations} = possible_values_set(x, y)
-//       changes += JSON.stringify(board_possible_values[x][y]) != JSON.stringify(new_values)
-//       board_possible_values[x][y] = new_values
-//       board_explanations[x][y] = explanations
-//     }
-//   }
-//   console.log(changes)
-//   return changes
-// }
-
-// var timeout_func = () => {
-//   board_solve()
-//   render_cells()
-// }
-
 fill_document()
 render_cells()
-// timeout_func()
