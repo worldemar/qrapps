@@ -8,6 +8,9 @@ var EMPTY_BOARD_L = [ROW_L,ROW_L,ROW_L,ROW_L,ROW_L,ROW_L,ROW_L,ROW_L,ROW_L]
 var copy = (x) => {
   return JSON.parse(JSON.stringify(x))
 }
+var strequals = (x, y) => {
+  return JSON.stringify(x) == JSON.stringify(y)
+}
 
 var board_locked_values = copy(EMPTY_BOARD_0)
 var board_selected_values = copy(EMPTY_BOARD_0)
@@ -16,15 +19,15 @@ var board_explanations = copy(EMPTY_BOARD_L)
 
 var board_get_value = (x, y) => {
   if (board_locked_values[x][y] != 0) {
-    return board_locked_values[x][y]
+    return [board_locked_values[x][y]]
   }
   if (board_selected_values[x][y] != 0) {
-    return board_selected_values[x][y]
+    return [board_selected_values[x][y]]
   }
-  if (board_possible_values[x][y].length == 1) {
-    return board_possible_values[x][y][0]
-  }
-  return null
+  // if (board_possible_values[x][y].length == 1) {
+  //   return board_possible_values[x][y][0]
+  // }
+  return board_possible_values[x][y]
 }
 
 var board_lock = () => {
@@ -45,33 +48,169 @@ var solve_reset = () => {
 }
 
 var solve_board = () => {
-  for (var y = 0; y < 9; y++) {
-    for (var x = 0; x < 9; x++) {
-      solve_quadrant_for_cell(x,y)
-      solve_row_for_cell(x,y)
-      solve_column_for_cell(x,y)
-    }
-  }
+  var changes = 0
+  changes += solve_quadrants()
+  changes += solve_columns()
+  changes += solve_rows()
+  return changes
 }
 
-var solve_quadrant_for_cell = (x, y) => {
-  // quadrants must have unique values
-  var qx = x - x % 3
-  var qy = y - y % 3
-  for (var j = qy; j < qy+3; j++) {
-    for (var i = qx; i < qx+3; i++) {
-      if (i == x && j == y) {
-        continue
-      }
-      var board_value = board_get_value(i,j)
-      var index = board_possible_values[x][y].indexOf(board_value)
-      if (index > -1) {
-        board_possible_values[x][y].splice(index, 1)
-        board_explanations[x][y].push(board_value + ' already in quadrant')
+var solve_set = (value_set, explanation_set, check_name) => {
+  var new_values = copy(value_set)
+  var new_explanations = copy(explanation_set)
+  // any "corellated" set of cells in sudoku
+  // should have unique values assigned to each cell
+  for (var i = 0; i < value_set.length; i++) {
+    if (value_set[i].length == 1) { // have specific value assigned
+      for(var j = 0; j < new_values.length; j++) { // eliminate that value for all other elements of the set
+        if (j != i) { // for all other cells (causig cell itself should retain causing value)
+          var idx = new_values[j].indexOf(value_set[i][0])
+          if (idx > -1) {
+            new_values[j].splice(idx, 1)
+            var expl = value_set[i][0] + ' already set in ' + check_name
+            if (!new_explanations[j].includes(expl)) {
+              new_explanations[j].push(expl)
+            }
+          }
+        }
       }
     }
   }
+  // any corellated set must not include more than N instances
+  // of possible value selections of size N
+  // otherwise there would be no way to spread possible values
+  for (var i = 0; i < value_set.length; i++) {
+    if (value_set[i].length > 1) {
+      var count = 0
+      for (var j = 0; j < value_set.length; j++) {
+        if (JSON.stringify(value_set[i]) == JSON.stringify(value_set[j])) {
+          count += 1 
+        }
+      }
+      var values = copy(value_set[i])
+      if (count >= values.length) { // value_set[i] is definitely not in any other cells, even if count covers exactly these values
+        for (var j = 0; j < new_values.length; j++) {
+          if (JSON.stringify(new_values[j]) != JSON.stringify(values)) {
+            new_values[j] = new_values[j].filter(e => values.indexOf(e) < 0)
+            var expl = 'set ' + values + ' already fully satisfied in ' + check_name
+            if (!new_explanations[j].includes(expl)) {
+              new_explanations[j].push(expl)
+            }
+          }
+        }
+      }
+      if (count > value_set[i].length) { // value_set[i] instances could not possibly cover all values, contradiction
+        for (var j = 0; j < value_set.length; j++) {
+          if (JSON.stringify(value_set[j]) == JSON.stringify(values)) {
+            new_values[j] = []
+            var expl = 'set ' + values + ' repeats too much (' + count + ') times'
+            if (!new_explanations[j].includes(expl)) {
+              new_explanations[j].push(expl)
+            }
+          }
+        }
+      }
+    }
+  }
+  return {new_values, new_explanations}
 }
+
+var solve_quadrants = () => {
+  var changes = 0
+  for (var qi = 0; qi < 3; qi++) {
+    for (var qj = 0; qj < 3; qj++) {
+      var quad_set = []
+      var expl_set = []
+      for (var x = qi*3; x < qi*3+3; x++) {
+        for (var y = qj*3; y < qj*3+3; y++) {
+          quad_set.push(board_get_value(x,y))
+          expl_set.push(board_explanations[x][y])
+        }
+      }
+      var ret = solve_set(quad_set, expl_set, 'quad ' + (qi+1) + ',' + (qj+1))
+      quad_set = ret.new_values
+      expl_set = ret.new_explanations
+      for (var x = qi*3; x < qi*3+3; x++) {
+        for (var y = qj*3; y < qj*3+3; y++) {
+          var new_values = quad_set.shift()
+          if (!strequals(board_possible_values[x][y],new_values)) {
+            changes += 1
+          }
+          board_possible_values[x][y] = new_values
+          board_explanations[x][y] = expl_set.shift()
+        }
+      }
+    }
+  }
+  return changes
+}
+
+var solve_columns = () => {
+  var changes = 0
+  for (var x = 0; x < 9; x++) {
+    var quad_set = []
+    var expl_set = []
+    for (var y = 0; y < 9; y++) {
+      quad_set.push(board_get_value(x,y))
+      expl_set.push(board_explanations[x][y])
+    }
+    var ret = solve_set(quad_set, expl_set, 'column ' + (x+1))
+    quad_set = ret.new_values
+    expl_set = ret.new_explanations
+    for (var y = 0; y < 9; y++) {
+      var new_values = quad_set.shift()
+      if (!strequals(board_possible_values[x][y],new_values)) {
+        changes += 1
+      }
+      board_possible_values[x][y] = new_values
+      board_explanations[x][y] = expl_set.shift()
+    }
+  }
+  return changes
+}
+
+var solve_rows = () => {
+  var changes = 0
+  for (var y = 0; y < 9; y++) {
+    var quad_set = []
+    var expl_set = []
+    for (var x = 0; x < 9; x++) {
+      quad_set.push(board_get_value(x,y))
+      expl_set.push(board_explanations[x][y])
+    }
+    var ret = solve_set(quad_set, expl_set, 'row ' + (y+1))
+    quad_set = ret.new_values
+    expl_set = ret.new_explanations
+    for (var x = 0; x < 9; x++) {
+      var new_values = quad_set.shift()
+      if (!strequals(board_possible_values[x][y],new_values)) {
+        changes += 1
+      }
+      board_possible_values[x][y] = new_values
+      board_explanations[x][y] = expl_set.shift()
+    }
+  }
+  return changes
+}
+
+// var solve_quadrant_for_cell = (x, y) => {
+//   // quadrants must have unique values
+//   var qx = x - x % 3
+//   var qy = y - y % 3
+//   for (var j = qy; j < qy+3; j++) {
+//     for (var i = qx; i < qx+3; i++) {
+//       if (i == x && j == y) {
+//         continue
+//       }
+//       var board_value = board_get_value(i,j)
+//       var index = board_possible_values[x][y].indexOf(board_value)
+//       if (index > -1) {
+//         board_possible_values[x][y].splice(index, 1)
+//         board_explanations[x][y].push(board_value + ' already in quadrant')
+//       }
+//     }
+//   }
+// }
 
 var solve_row_for_cell = (x, y) => {
   // rows must have unique values
@@ -199,29 +338,29 @@ var fill_document = () => {
 
 var btn_lock = () => {
   board_lock()
-  solve_board()
-  render_cells()
+  autosolve()
 }
 
 var btn_clear = () => {
   board_clear()
   solve_reset()
-  solve_board()
-  render_cells()
+  autosolve()
 }
 
 var button_click = (x, y, value) => {
   board_selected_values[x][y] = value
   solve_reset()
-  solve_board()
-  render_cells()
+  autosolve()
 }
 
-var repeat = () => {
-  solve_board()
+var autosolve = () => {
+  var changes = solve_board()
   render_cells()
-  setTimeout(repeat, 1000)
+  if (changes > 0) {
+    console.log(changes)
+    setTimeout(autosolve, 10)
+  }
 }
 
 fill_document()
-repeat()
+autosolve()
