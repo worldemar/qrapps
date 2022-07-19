@@ -96,7 +96,6 @@ var possible_values_set = (x, y) => {
       if (Array.isArray(nv.new_values)) {
         if (JSON.stringify(nv.new_values) == JSON.stringify(new_values)) {
           same_sets += 1
-          console.log(same_sets)
         }
       }
     }
@@ -129,14 +128,15 @@ var render_cell = (x, y) => {
   } else if (board_selected_values[x][y] != 0) {
     cell.innerHTML = button_txt(x, y, 'large', 0, false, board_selected_values[x][y], [])
   } else {
-    var {new_values, explanations} = possible_values_set(x, y) // board_possible_values[x][y]
-    if (new_values.length == 0) {
+    values = board_possible_values[x][y]
+    explanations = board_explanations[x][y]
+    if (values.length == 0) {
       cell.innerHTML = button_txt(x, y, 'error', 0, true, 'X', explanations)
     } else {
       var new_html = ''
       for (var i = 1; i <= 9; i++) {
-        var classname = 'board '+ (new_values.includes(i) ? ['single', 'double'][new_values.length - 1] : [])
-        new_html += button_txt(x, y, classname, i, !new_values.includes(i), i, explanations)
+        var classname = 'board '+ (values.includes(i) ? ['single', 'double'][values.length - 1] : [])
+        new_html += button_txt(x, y, classname, i, !values.includes(i), i, explanations)
         new_html += i % 3 == 0 ? '<br/>' : ''
       }
       cell.innerHTML = new_html
@@ -176,18 +176,37 @@ var fill_document = () => {
 
 var btn_lock = () => {
   board_lock()
+  solve_board()
   render_cells()
 }
 
 var btn_clear = () => {
   board_clear()
+  solve_board()
   render_cells()
 }
 
 var button_click = (x, y, value) => {
   board_selected_values[x][y] = value
+  solve_board()
   render_cells()
 }
 
+var solve_board = () => {
+  for (var y = 0; y < 9; y++) {
+    for (var x = 0; x < 9; x++) {
+      var {new_values, explanations} = possible_values_basic(x, y)
+      board_possible_values[x][y] = new_values
+      board_explanations[x][y] = explanations
+    }
+  }
+}
+
+var repeat = () => {
+  solve_board()
+  render_cells()
+  setTimeout(render, 1000)
+}
+
 fill_document()
-render_cells()
+repeat()
