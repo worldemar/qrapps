@@ -24,9 +24,6 @@ var board_get_value = (x, y) => {
   if (board_selected_values[x][y] != 0) {
     return [board_selected_values[x][y]]
   }
-  // if (board_possible_values[x][y].length == 1) {
-  //   return board_possible_values[x][y][0]
-  // }
   return board_possible_values[x][y]
 }
 
@@ -39,8 +36,6 @@ var board_clear = () => {
   board_possible_values = copy(EMPTY_BOARD_L)
   board_explanations = copy(EMPTY_BOARD_L)
 }
-
-
 
 var solve_reset = () => {
   board_possible_values = copy(EMPTY_BOARD_9)
@@ -193,84 +188,6 @@ var solve_rows = () => {
   return changes
 }
 
-// var solve_quadrant_for_cell = (x, y) => {
-//   // quadrants must have unique values
-//   var qx = x - x % 3
-//   var qy = y - y % 3
-//   for (var j = qy; j < qy+3; j++) {
-//     for (var i = qx; i < qx+3; i++) {
-//       if (i == x && j == y) {
-//         continue
-//       }
-//       var board_value = board_get_value(i,j)
-//       var index = board_possible_values[x][y].indexOf(board_value)
-//       if (index > -1) {
-//         board_possible_values[x][y].splice(index, 1)
-//         board_explanations[x][y].push(board_value + ' already in quadrant')
-//       }
-//     }
-//   }
-// }
-
-var solve_row_for_cell = (x, y) => {
-  // rows must have unique values
-  for (var i = 0; i < 9; i++) {
-    if (i == x) {
-      continue
-    }
-    var board_value = board_get_value(i,y)
-    var index = board_possible_values[x][y].indexOf(board_value)
-    if (index > -1) {
-      board_possible_values[x][y].splice(index, 1);
-      board_explanations[x][y].push(board_value + ' already in row (' + i + ')')
-    }
-  }
-}
-
-var solve_column_for_cell = (x, y) => {
-  // columns must have unique values
-  for (var i = 0; i < 9; i++) {
-    if (i == y) {
-      continue
-    }
-    var board_value = board_get_value(x,i)
-    var index = board_possible_values[x][y].indexOf(board_value)
-    if (index > -1) {
-      board_possible_values[x][y].splice(index, 1)
-      board_explanations[x][y].push(board_value + ' already in column (' + i + ')')
-    }
-  }
-}
-
-var possible_values_set = (x, y) => {
-  var {new_values, explanations} = possible_values_basic(x, y)
-  // quadrants must not have more sets of new_values that it's length
-  // otherwise there is no way to spread all values to them
-  var same_sets = 1
-  var qx = x - x % 3
-  var qy = y - y % 3
-  for (var j = qy; j < qy+3; j++) {
-    for (var i = qx; i < qx+3; i++) {
-      if (i == x && j == y) {
-        continue
-      }
-      var nv = possible_values_basic(i, j)
-      if (Array.isArray(nv.new_values)) {
-        if (JSON.stringify(nv.new_values) == JSON.stringify(new_values)) {
-          same_sets += 1
-        }
-      }
-    }
-  }
-  if (same_sets > new_values.length) {
-    explanations.push(JSON.stringify(new_values) + ' in quadrant ' + same_sets + ' times')
-    new_values = []
-  }
-
-  explanations.sort()
-  return {new_values, explanations}
-}
-
 var button_txt = (x, y, c, i, d, s, e) => {
   return '<button title="' + e.join('\n') + '" class="' + c + '" onclick="button_click(' + x + ',' + y + ',' + i + ')" type=button ' + (d ? 'disabled' : '') + '>' + s + '</button>'
 }
@@ -308,7 +225,7 @@ var render_cell = (x, y) => {
 
 var fill_document = () => {
   var table = ''
-  table += '<table cellpadding=0>'
+  table += '<table class=board cellpadding=0>'
   for (var indemy = 0; indemy < 3; indemy++) {
     table += '<tr>'
     for (var indemx = 0; indemx < 3; indemx++) {
@@ -317,9 +234,7 @@ var fill_document = () => {
       for (var indey = 0; indey < 3; indey++) {
         table += '<tr>'
         for (var index = 0; index < 3; index++) {
-          var indexx = indemx * 3 + index
-          var indeyy = indemy * 3 + indey
-          table += '<td class=cell id="c' + indexx + indeyy + '"></td>'
+          table += '<td class=cell id="c' + (indemx * 3 + index) + (indemy * 3 + indey) + '"></td>'
         }
         table += '</tr>'
       }
@@ -329,11 +244,12 @@ var fill_document = () => {
     table += '</tr>'
   }
   table += '</table>'
-  document.getElementsByTagName('body')[0].innerHTML = '<button class=single>X</button> - one option left&nbsp;'
-  document.getElementsByTagName('body')[0].innerHTML += '<button class=double>Y</button> - two options left&nbsp;'
-  document.getElementsByTagName('body')[0].innerHTML += '<button onclick="btn_lock()">Freeze resolved values</button>&nbsp;'
-  document.getElementsByTagName('body')[0].innerHTML += '<button onclick="btn_clear()">Clear solution</button>&nbsp;'
-  document.getElementsByTagName('body')[0].innerHTML += '<p>' + table + '</p>'
+  table = '<a class="board single"> X </a> = one option left&nbsp;' +
+    '<a class="board double"> Y </a> = two options left<br/>' +
+    '<a class=board onclick="btn_lock()">Freeze resolved values</a>&nbsp;' +
+    '<a class=board onclick="btn_clear()">Clear solution</a>' +
+    '<p>' + table + '</p>'
+  document.getElementsByTagName('body')[0].innerHTML = table
 }
 
 var btn_lock = () => {

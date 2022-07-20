@@ -1,42 +1,7 @@
-body {
-    font-family: sans;
-}
-
-table {
-    border: 1px solid black;
-    border-collapse: collapse;
-    border-spacing: 0px;
-}
-
-button.board {
-    width: 24px;
-    height: 24px;
-    font-size: 16px;
-}
-
-button.single {
-    font-weight: bold;
-    background-color: lime;
-    border: 1px solid black;
-    border-radius: 2px;
-}
-
-button.double {
-    font-weight: bold;
-    background-color: cyan;
-    border: 1px solid black;
-    border-radius: 2px;
-}
-
-button.large {
-    width: 72px;
-    height: 72px;
-    font-size: 48px;
-}
-
-button.error {
-    width: 72px;
-    height: 72px;
-    font-size: 48px;
-    color: red;
-}
+body { font-family: sans; }
+.board { border-radius: 2px; border: 1px solid grey; }
+button { width: 24px; height: 24px; font-size: 16px; }
+.single { background-color: lime; }
+.double { background-color: cyan; }
+.large { width: 72px; height: 72px; font-size: 48px; }
+.error { width: 72px; height: 72px; font-size: 48px; color: red; }
