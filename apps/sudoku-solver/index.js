@@ -71,7 +71,7 @@ var solve_set = (value_set, explanation_set, check_name) => {
           var idx = new_values[j].indexOf(value_set[i][0])
           if (idx > -1) {
             new_values[j].splice(idx, 1)
-            var expl = value_set[i][0] + ' already set in ' + check_name + ' - position ' + (i+1)
+            var expl = `${value_set[i][0]} already set in ${check_name} - position ${i+1}`
             if (!new_explanations[j].includes(expl)) {
               new_explanations[j].push(expl)
             }
@@ -98,7 +98,7 @@ var solve_set = (value_set, explanation_set, check_name) => {
         for (var j = 0; j < new_values.length; j++) {
           if (JSONSTRINGIFY(new_values[j]) != JSONSTRINGIFY(values)) {
             new_values[j] = new_values[j].filter(e => values.indexOf(e) < 0)
-            var expl = 'set ' + values + ' already fully satisfied in ' + check_name + ' - positions ' + positions
+            var expl = `set ${values} already fully satisfied in ${check_name} - positions ${positions}`
             if (!new_explanations[j].includes(expl)) {
               new_explanations[j].push(expl)
             }
@@ -109,7 +109,7 @@ var solve_set = (value_set, explanation_set, check_name) => {
         for (var j = 0; j < value_set.length; j++) {
           if (JSONSTRINGIFY(value_set[j]) == JSONSTRINGIFY(values)) {
             new_values[j] = []
-            var expl = 'set ' + values + ' repeats too much (' + count + ') times'
+            var expl = `set ${values} repeats too much: ${count} times`
             if (!new_explanations[j].includes(expl)) {
               new_explanations[j].push(expl)
             }
@@ -133,7 +133,7 @@ var solve_quadrants = () => {
           expl_set.push(board_explanations[x][y])
         }
       }
-      var ret = solve_set(quad_set, expl_set, 'quad ' + (qi+1) + ',' + (qj+1))
+      var ret = solve_set(quad_set, expl_set, `quad ${qi+1},${qj+1}`)
       quad_set = ret.new_values
       expl_set = ret.new_explanations
       for (var y = qj*3; y < qj*3+3; y++) {
@@ -184,7 +184,7 @@ var solve_line = (column) => {
 // user interface
 
 var button_txt = (x, y, c, i, d, s, e) => {
-  return '<button title="' + e.join('\n') + '" class="' + c + '" onclick="button_click(' + x + ',' + y + ',' + i + ')" type=button ' + (d ? 'disabled' : '') + '>' + s + '</button>'
+  return `<button title="${e.join('\n')}" class="${c}" onclick="button_click(${x},${y},${i})" type=button ${d ? 'disabled' : ''}>${s}</button>`
 }
 
 var render_cells = () => {
@@ -229,7 +229,7 @@ var fill_document = () => {
       for (var indey = 0; indey < 3; indey++) {
         table += '<tr>'
         for (var index = 0; index < 3; index++) {
-          table += '<td class=cell id="c' + (indemx * 3 + index) + (indemy * 3 + indey) + '"></td>'
+          table += `<td class=cell id=c${indemx * 3 + index}${indemy * 3 + indey}></td>`
         }
         table += '</tr>'
       }
@@ -243,7 +243,7 @@ var fill_document = () => {
     '<a class=double>&emsp;</a> = two options left<br/>' +
     '<a class=board onclick=btn_lock()>Freeze resolved values</a>&nbsp;' +
     '<a class=board onclick=btn_clear()>Clear solution</a>' +
-    '<p>' + table + '</p>'
+    '<p>' + table + '</p>' // this is not a template string since it increases size
   document.getElementsByTagName('body')[0].innerHTML = table
 }
 
