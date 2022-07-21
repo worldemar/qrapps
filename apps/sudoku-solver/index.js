@@ -8,6 +8,7 @@ var copy = (x) => {
 var strequals = (x, y) => {
   return JSONSTRINGIFY(x) == JSONSTRINGIFY(y)
 }
+var len = (x) => x.length
 
 // board reset arrays
 
@@ -60,9 +61,9 @@ var solve_set = (value_set, explanation_set, check_name) => {
   var new_explanations = copy(explanation_set)
   // any "corellated" set of cells in sudoku
   // should have unique values assigned to each cell
-  for (var i = 0; i < value_set.length; i++) {
-    if (value_set[i].length == 1) { // have specific value assigned
-      for(var j = 0; j < new_values.length; j++) { // eliminate that value for all other elements of the set
+  for (var i = 0; i < len(value_set); i++) {
+    if (len(value_set[i]) == 1) { // have specific value assigned
+      for(var j = 0; j < len(new_values); j++) { // eliminate that value for all other elements of the set
         if (j != i) { // for all other cells (causig cell itself should retain causing value)
           var idx = new_values[j].indexOf(value_set[i][0])
           if (idx > -1) {
@@ -79,19 +80,19 @@ var solve_set = (value_set, explanation_set, check_name) => {
   // any corellated set must not include more than N instances
   // of possible value selections of size N
   // otherwise there would be no way to spread possible values
-  for (var i = 0; i < value_set.length; i++) {
-    if (value_set[i].length > 1) {
+  for (var i = 0; i < len(value_set); i++) {
+    if (len(value_set[i]) > 1) {
       var count = 0
       var positions = []
-      for (var j = 0; j < value_set.length; j++) {
+      for (var j = 0; j < len(value_set); j++) {
         if (JSONSTRINGIFY(value_set[i]) == JSONSTRINGIFY(value_set[j])) {
           count += 1
           positions.push(j+1)
         }
       }
       var values = copy(value_set[i])
-      if (count >= values.length) { // value_set[i] is definitely not in any other cells, even if count covers exactly these values
-        for (var j = 0; j < new_values.length; j++) {
+      if (count >= len(values)) { // value_set[i] is definitely not in any other cells, even if count covers exactly these values
+        for (var j = 0; j < len(new_values); j++) {
           if (JSONSTRINGIFY(new_values[j]) != JSONSTRINGIFY(values)) {
             new_values[j] = new_values[j].filter(e => values.indexOf(e) < 0)
             var expl = `set ${values} already fully satisfied in ${check_name} - positions ${positions}`
@@ -101,8 +102,8 @@ var solve_set = (value_set, explanation_set, check_name) => {
           }
         }
       }
-      if (count > values.length) { // value_set[i] instances could not possibly cover all values, contradiction
-        for (var j = 0; j < value_set.length; j++) {
+      if (count > len(values)) { // value_set[i] instances could not possibly cover all values, contradiction
+        for (var j = 0; j < len(value_set); j++) {
           if (JSONSTRINGIFY(value_set[j]) == JSONSTRINGIFY(values)) {
             new_values[j] = []
             var expl = `set ${values} repeats too much: ${count} times`
@@ -200,12 +201,12 @@ var render_cell = (x, y) => {
   } else {
     values = board_possible_values[x][y]
     explanations = board_explanations[x][y]
-    if (values.length == 0) {
+    if (len(values) == 0) {
       cell.innerHTML = button_txt(x, y, 'error', 0, true, 'X', explanations)
     } else {
       var new_html = ''
       for (var i = 1; i <= 9; i++) {
-        var classname = 'board '+ (values.includes(i) ? ['single', 'double'][values.length - 1] : [])
+        var classname = 'board '+ (values.includes(i) ? ['single', 'double'][len(values) - 1] : [])
         new_html += button_txt(x, y, classname, i, !values.includes(i), i, explanations)
         new_html += i % 3 == 0 ? '<br/>' : ''
       }
