@@ -209,26 +209,14 @@ var render_cell = (x, y) => {
 }
 
 var fill_document = () => {
+  var quad_spacing = 2
+  var cell_spacing = 2
   var table = ''
-  table += '<table>'
-  for (var indemy = 0; indemy < 3; indemy++) {
-    table += '<tr>'
-    for (var indemx = 0; indemx < 3; indemx++) {
-      table += '<td>'
-      table += '<table>'
-      for (var indey = 0; indey < 3; indey++) {
-        table += '<tr>'
-        for (var index = 0; index < 3; index++) {
-          table += `<td class=cell id=c${indemx * 3 + index}${indemy * 3 + indey}></td>`
-        }
-        table += '</tr>'
-      }
-      table += '</table>'
-      table += '</td>'
+  for (var indey = 0; indey < 9; indey++) {
+    for (var index = 0; index < 9; index++) {
+      table += `<span style="position: absolute; left: ${16 + (index - index % 3) * quad_spacing + index * (24 * 3 + cell_spacing)}; top: ${64 + (indey - indey % 3) * quad_spacing + indey * (24 * 3 + cell_spacing)}" class=cell id=c${index}${indey}></span>`
     }
-    table += '</tr>'
   }
-  table += '</table>'
   table = '<a class=single>&emsp;</a> = one option left&nbsp;' +
     '<a class=double>&emsp;</a> = two options left<br/>' +
     '<a class=board onclick=btn_lock()>Freeze resolved values</a>&nbsp;' +
