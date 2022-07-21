@@ -2,13 +2,10 @@
 
 var ARRAYFILL = (s, e) => Array(s).fill(e)
 var JSONSTRINGIFY = (x) => JSON.stringify(x)
-var copy = (x) => {
-  return JSON.parse(JSONSTRINGIFY(x))
-}
-var strequals = (x, y) => {
-  return JSONSTRINGIFY(x) == JSONSTRINGIFY(y)
-}
+var copy = (x) => JSON.parse(JSONSTRINGIFY(x))
+var strequals = (x, y) => JSONSTRINGIFY(x) == JSONSTRINGIFY(y)
 var len = (x) => x.length
+var INNERHTML = (e, h) => e.innerHTML = h
 
 // board reset arrays
 
@@ -181,7 +178,7 @@ var solve_line = (column) => {
 // user interface
 
 var button_txt = (x, y, c, i, d, s, e) => {
-  return `<button title="${e.join('\n')}" class="${c}" onclick="button_click(${x},${y},${i})" type=button ${d ? 'disabled' : ''}>${s}</button>`
+  return `<button title="${e.join('\n')}" class="${c}" onclick=button_click(${x},${y},${i}) type=button ${d ? 'disabled' : ''}>${s}</button>`
 }
 
 var render_cells = () => {
@@ -193,16 +190,16 @@ var render_cells = () => {
 }
 
 var render_cell = (x, y) => {
-  var cell = document.getElementById('c' + x + y)
+  var cell = document.getElementById(`c${x}${y}`)
   if (board_locked_values[x][y] != 0) {
-    cell.innerHTML = button_txt(x, y, 'large', 0, true, board_locked_values[x][y], [])
+    INNERHTML(cell, button_txt(x, y, 'large', 0, true, board_locked_values[x][y], []))
   } else if (board_selected_values[x][y] != 0) {
-    cell.innerHTML = button_txt(x, y, 'large', 0, false, board_selected_values[x][y], [])
+    INNERHTML(cell, button_txt(x, y, 'large', 0, false, board_selected_values[x][y], []))
   } else {
     values = board_possible_values[x][y]
     explanations = board_explanations[x][y]
     if (len(values) == 0) {
-      cell.innerHTML = button_txt(x, y, 'error', 0, true, 'X', explanations)
+      INNERHTML(cell, button_txt(x, y, 'error', 0, true, 'X', explanations))
     } else {
       var new_html = ''
       for (var i = 1; i <= 9; i++) {
@@ -210,7 +207,7 @@ var render_cell = (x, y) => {
         new_html += button_txt(x, y, classname, i, !values.includes(i), i, explanations)
         new_html += i % 3 == 0 ? '<br/>' : ''
       }
-      cell.innerHTML = new_html
+      INNERHTML(cell, new_html)
     }
   }
 }
@@ -241,7 +238,7 @@ var fill_document = () => {
     '<a class=board onclick=btn_lock()>Freeze resolved values</a>&nbsp;' +
     '<a class=board onclick=btn_clear()>Clear solution</a>' +
     '<p>' + table + '</p>' // this is not a template string since it increases size
-  document.getElementsByTagName('body')[0].innerHTML = table
+  INNERHTML(document.getElementsByTagName('body')[0], table)
 }
 
 var btn_lock = () => {
