@@ -52,11 +52,7 @@ var solve_reset = () => {
 // board solving
 
 var solve_board = () => {
-  var changes = 0
-  changes += solve_quadrants()
-  changes += solve_line(false)
-  changes += solve_line(true)
-  return changes
+  return solve_quadrants() + solve_line(false) + solve_line(true)
 }
 
 var solve_set = (value_set, explanation_set, check_name) => {
@@ -105,7 +101,7 @@ var solve_set = (value_set, explanation_set, check_name) => {
           }
         }
       }
-      if (count > value_set[i].length) { // value_set[i] instances could not possibly cover all values, contradiction
+      if (count > values.length) { // value_set[i] instances could not possibly cover all values, contradiction
         for (var j = 0; j < value_set.length; j++) {
           if (JSONSTRINGIFY(value_set[j]) == JSONSTRINGIFY(values)) {
             new_values[j] = []
