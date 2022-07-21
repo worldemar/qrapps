@@ -1,21 +1,28 @@
-var ROW_0 = [0,0,0,0,0,0,0,0,0]
-var EMPTY_BOARD_0 = [ROW_0,ROW_0,ROW_0,ROW_0,ROW_0,ROW_0,ROW_0,ROW_0,ROW_0]
-var CELL_9 = [1,2,3,4,5,6,7,8,9]
-var ROW_L = [[],[],[],[],[],[],[],[],[]]
-var ROW_9 = [CELL_9,CELL_9,CELL_9,CELL_9,CELL_9,CELL_9,CELL_9,CELL_9,CELL_9]
-var EMPTY_BOARD_9 = [ROW_9,ROW_9,ROW_9,ROW_9,ROW_9,ROW_9,ROW_9,ROW_9,ROW_9]
-var EMPTY_BOARD_L = [ROW_L,ROW_L,ROW_L,ROW_L,ROW_L,ROW_L,ROW_L,ROW_L,ROW_L]
+// code compactify utilities
+
+var ARRAYFILL = (s, e) => Array(s).fill(e)
+var JSONSTRINGIFY = (x) => JSON.stringify(x)
 var copy = (x) => {
-  return JSON.parse(JSON.stringify(x))
+  return JSON.parse(JSONSTRINGIFY(x))
 }
 var strequals = (x, y) => {
-  return JSON.stringify(x) == JSON.stringify(y)
+  return JSONSTRINGIFY(x) == JSONSTRINGIFY(y)
 }
+
+// board reset arrays
+
+var EMPTY_BOARD_0 = ARRAYFILL(9,ARRAYFILL(9,0))
+var EMPTY_BOARD_9 = ARRAYFILL(9,ARRAYFILL(9,[1,2,3,4,5,6,7,8,9]))
+var EMPTY_BOARD_L = ARRAYFILL(9,ARRAYFILL(9,[]))
+
+// board work arrays
 
 var board_locked_values = copy(EMPTY_BOARD_0)
 var board_selected_values = copy(EMPTY_BOARD_0)
 var board_possible_values = copy(EMPTY_BOARD_9)
 var board_explanations = copy(EMPTY_BOARD_L)
+
+// board manipulation utilities
 
 var board_get_value = (x, y) => {
   if (board_locked_values[x][y] != 0) {
@@ -42,11 +49,13 @@ var solve_reset = () => {
   board_explanations = copy(EMPTY_BOARD_L)
 }
 
+// board solving
+
 var solve_board = () => {
   var changes = 0
   changes += solve_quadrants()
-  changes += solve_columns()
-  changes += solve_rows()
+  changes += solve_line(false)
+  changes += solve_line(true)
   return changes
 }
 
@@ -62,7 +71,7 @@ var solve_set = (value_set, explanation_set, check_name) => {
           var idx = new_values[j].indexOf(value_set[i][0])
           if (idx > -1) {
             new_values[j].splice(idx, 1)
-            var expl = value_set[i][0] + ' already set in ' + check_name
+            var expl = value_set[i][0] + ' already set in ' + check_name + ' - position ' + (i+1)
             if (!new_explanations[j].includes(expl)) {
               new_explanations[j].push(expl)
             }
@@ -77,17 +86,19 @@ var solve_set = (value_set, explanation_set, check_name) => {
   for (var i = 0; i < value_set.length; i++) {
     if (value_set[i].length > 1) {
       var count = 0
+      var positions = []
       for (var j = 0; j < value_set.length; j++) {
-        if (JSON.stringify(value_set[i]) == JSON.stringify(value_set[j])) {
-          count += 1 
+        if (JSONSTRINGIFY(value_set[i]) == JSONSTRINGIFY(value_set[j])) {
+          count += 1
+          positions.push(j+1)
         }
       }
       var values = copy(value_set[i])
       if (count >= values.length) { // value_set[i] is definitely not in any other cells, even if count covers exactly these values
         for (var j = 0; j < new_values.length; j++) {
-          if (JSON.stringify(new_values[j]) != JSON.stringify(values)) {
+          if (JSONSTRINGIFY(new_values[j]) != JSONSTRINGIFY(values)) {
             new_values[j] = new_values[j].filter(e => values.indexOf(e) < 0)
-            var expl = 'set ' + values + ' already fully satisfied in ' + check_name
+            var expl = 'set ' + values + ' already fully satisfied in ' + check_name + ' - positions ' + positions
             if (!new_explanations[j].includes(expl)) {
               new_explanations[j].push(expl)
             }
@@ -96,7 +107,7 @@ var solve_set = (value_set, explanation_set, check_name) => {
       }
       if (count > value_set[i].length) { // value_set[i] instances could not possibly cover all values, contradiction
         for (var j = 0; j < value_set.length; j++) {
-          if (JSON.stringify(value_set[j]) == JSON.stringify(values)) {
+          if (JSONSTRINGIFY(value_set[j]) == JSONSTRINGIFY(values)) {
             new_values[j] = []
             var expl = 'set ' + values + ' repeats too much (' + count + ') times'
             if (!new_explanations[j].includes(expl)) {
@@ -116,8 +127,8 @@ var solve_quadrants = () => {
     for (var qj = 0; qj < 3; qj++) {
       var quad_set = []
       var expl_set = []
-      for (var x = qi*3; x < qi*3+3; x++) {
-        for (var y = qj*3; y < qj*3+3; y++) {
+      for (var y = qj*3; y < qj*3+3; y++) {
+        for (var x = qi*3; x < qi*3+3; x++) {
           quad_set.push(board_get_value(x,y))
           expl_set.push(board_explanations[x][y])
         }
@@ -125,8 +136,8 @@ var solve_quadrants = () => {
       var ret = solve_set(quad_set, expl_set, 'quad ' + (qi+1) + ',' + (qj+1))
       quad_set = ret.new_values
       expl_set = ret.new_explanations
-      for (var x = qi*3; x < qi*3+3; x++) {
-        for (var y = qj*3; y < qj*3+3; y++) {
+      for (var y = qj*3; y < qj*3+3; y++) {
+        for (var x = qi*3; x < qi*3+3; x++) {
           var new_values = quad_set.shift()
           if (!strequals(board_possible_values[x][y],new_values)) {
             changes += 1
@@ -140,53 +151,37 @@ var solve_quadrants = () => {
   return changes
 }
 
-var solve_columns = () => {
+var solve_line = (column) => {
+  // column: boolean, true = solve columns, false = solve rows (flip coordinates)
   var changes = 0
-  for (var x = 0; x < 9; x++) {
-    var quad_set = []
-    var expl_set = []
-    for (var y = 0; y < 9; y++) {
-      quad_set.push(board_get_value(x,y))
-      expl_set.push(board_explanations[x][y])
+  for (var i = 0; i < 9; i++) {
+    var values = []
+    var explanations = []
+    for (var j = 0; j < 9; j++) {
+      values.push(column ? board_get_value(i,j) : board_get_value(j,i))
+      explanations.push(column ? board_explanations[i][j] : board_explanations[j][i])
     }
-    var ret = solve_set(quad_set, expl_set, 'column ' + (x+1))
-    quad_set = ret.new_values
-    expl_set = ret.new_explanations
-    for (var y = 0; y < 9; y++) {
-      var new_values = quad_set.shift()
-      if (!strequals(board_possible_values[x][y],new_values)) {
+    var ret = solve_set(values, explanations, (column ? 'column ' : 'row ') + (i+1))
+    values = ret.new_values
+    explanations = ret.new_explanations
+    for (var j = 0; j < 9; j++) {
+      var new_values = values.shift()
+      if (!strequals(column ? board_possible_values[i][j] : board_possible_values[j][i],new_values)) {
         changes += 1
       }
-      board_possible_values[x][y] = new_values
-      board_explanations[x][y] = expl_set.shift()
+      if (column) {
+        board_possible_values[i][j] = new_values
+        board_explanations[i][j] = explanations.shift()
+      } else {
+        board_possible_values[j][i] = new_values
+        board_explanations[j][i] = explanations.shift()
+      }
     }
   }
   return changes
 }
 
-var solve_rows = () => {
-  var changes = 0
-  for (var y = 0; y < 9; y++) {
-    var quad_set = []
-    var expl_set = []
-    for (var x = 0; x < 9; x++) {
-      quad_set.push(board_get_value(x,y))
-      expl_set.push(board_explanations[x][y])
-    }
-    var ret = solve_set(quad_set, expl_set, 'row ' + (y+1))
-    quad_set = ret.new_values
-    expl_set = ret.new_explanations
-    for (var x = 0; x < 9; x++) {
-      var new_values = quad_set.shift()
-      if (!strequals(board_possible_values[x][y],new_values)) {
-        changes += 1
-      }
-      board_possible_values[x][y] = new_values
-      board_explanations[x][y] = expl_set.shift()
-    }
-  }
-  return changes
-}
+// user interface
 
 var button_txt = (x, y, c, i, d, s, e) => {
   return '<button title="' + e.join('\n') + '" class="' + c + '" onclick="button_click(' + x + ',' + y + ',' + i + ')" type=button ' + (d ? 'disabled' : '') + '>' + s + '</button>'
@@ -225,7 +220,7 @@ var render_cell = (x, y) => {
 
 var fill_document = () => {
   var table = ''
-  table += '<table class=board cellpadding=0>'
+  table += '<table cellpadding=0>'
   for (var indemy = 0; indemy < 3; indemy++) {
     table += '<tr>'
     for (var indemx = 0; indemx < 3; indemx++) {

@@ -1,5 +1,5 @@
 body { font-family: sans; }
-.board { border-radius: 2px; border: 1px solid grey; }
+table,.board { border-radius: 2px; border: 1px solid grey; }
 button { width: 24px; height: 24px; font-size: 16px; }
 .single { background-color: lime; }
 .double { background-color: cyan; }
