@@ -174,7 +174,7 @@ var solve_line = (column) => {
 // user interface
 
 var button_txt = (x, y, c, i, d, s, e) => {
-  return `<button title="${e.join('\n')}" class="${c}" onclick=button_click(${x},${y},${i}) type=button ${d ? 'disabled' : ''}>${s}</button>`
+  return `<button title="${e.join('\n')}" class="${c}" onclick=b_c(${x},${y},${i}) type=button ${d ? 'disabled' : ''}>${s}</button>`
 }
 
 var render_cells = () => {
@@ -188,18 +188,18 @@ var render_cells = () => {
 var render_cell = (x, y) => {
   var cell = document.getElementById(`c${x}${y}`)
   if (board_locked_values[x][y] != 0) {
-    INNERHTML(cell, button_txt(x, y, 'large', 0, true, board_locked_values[x][y], []))
+    INNERHTML(cell, button_txt(x, y, 'l', 0, true, board_locked_values[x][y], []))
   } else if (board_selected_values[x][y] != 0) {
-    INNERHTML(cell, button_txt(x, y, 'large', 0, false, board_selected_values[x][y], []))
+    INNERHTML(cell, button_txt(x, y, 'l', 0, false, board_selected_values[x][y], []))
   } else {
     values = board_possible_values[x][y]
     explanations = board_explanations[x][y]
     if (len(values) == 0) {
-      INNERHTML(cell, button_txt(x, y, 'error', 0, true, 'X', explanations))
+      INNERHTML(cell, button_txt(x, y, 'e', 0, true, 'X', explanations))
     } else {
       var new_html = ''
       for (var i = 1; i <= 9; i++) {
-        var classname = 'board '+ (values.includes(i) ? ['single', 'double'][len(values) - 1] : [])
+        var classname = 'b '+ (values.includes(i) ? ['s', 'd'][len(values) - 1] : [])
         new_html += button_txt(x, y, classname, i, !values.includes(i), i, explanations)
         new_html += i % 3 == 0 ? '<br/>' : ''
       }
@@ -217,26 +217,26 @@ var fill_document = () => {
       table += `<span style="position: absolute; left: ${16 + (index - index % 3) * quad_spacing + index * (24 * 3 + cell_spacing)}; top: ${64 + (indey - indey % 3) * quad_spacing + indey * (24 * 3 + cell_spacing)}" class=cell id=c${index}${indey}></span>`
     }
   }
-  table = '<a class=single>&emsp;</a> = one option left&nbsp;' +
-    '<a class=double>&emsp;</a> = two options left<br/>' +
-    '<a class=board onclick=btn_lock()>Freeze resolved values</a>&nbsp;' +
-    '<a class=board onclick=btn_clear()>Clear solution</a>' +
+  table = '<a class=s>&emsp;</a> = one option left&nbsp;' +
+    '<a class=d>&emsp;</a> = two options left<br/>' +
+    '<a class=b onclick=b_l()>Freeze resolved values</a>&nbsp;' +
+    '<a class=b onclick=b_e()>Clear solution</a>' +
     '<p>' + table + '</p>' // this is not a template string since it increases size
   INNERHTML(document.getElementsByTagName('body')[0], table)
 }
 
-var btn_lock = () => {
+var b_l = () => {
   board_lock()
   autosolve()
 }
 
-var btn_clear = () => {
+var b_e = () => {
   board_clear()
   solve_reset()
   autosolve()
 }
 
-var button_click = (x, y, value) => {
+var b_c = (x, y, value) => {
   board_selected_values[x][y] = value
   solve_reset()
   autosolve()
