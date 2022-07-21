@@ -220,12 +220,12 @@ var render_cell = (x, y) => {
 
 var fill_document = () => {
   var table = ''
-  table += '<table cellpadding=0>'
+  table += '<table>'
   for (var indemy = 0; indemy < 3; indemy++) {
     table += '<tr>'
     for (var indemx = 0; indemx < 3; indemx++) {
       table += '<td>'
-      table += '<table cellpadding=4>'
+      table += '<table>'
       for (var indey = 0; indey < 3; indey++) {
         table += '<tr>'
         for (var index = 0; index < 3; index++) {
@@ -239,10 +239,10 @@ var fill_document = () => {
     table += '</tr>'
   }
   table += '</table>'
-  table = '<a class="board single"> X </a> = one option left&nbsp;' +
-    '<a class="board double"> Y </a> = two options left<br/>' +
-    '<a class=board onclick="btn_lock()">Freeze resolved values</a>&nbsp;' +
-    '<a class=board onclick="btn_clear()">Clear solution</a>' +
+  table = '<a class=single>&emsp;</a> = one option left&nbsp;' +
+    '<a class=double>&emsp;</a> = two options left<br/>' +
+    '<a class=board onclick=btn_lock()>Freeze resolved values</a>&nbsp;' +
+    '<a class=board onclick=btn_clear()>Clear solution</a>' +
     '<p>' + table + '</p>'
   document.getElementsByTagName('body')[0].innerHTML = table
 }

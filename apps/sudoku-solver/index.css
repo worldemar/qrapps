@@ -1,7 +1,8 @@
 body { font-family: sans; }
-table,.board { border-radius: 2px; border: 1px solid grey; }
+table { background: tan; }
+a,table,.board { border-radius: 2px; border: 1px solid grey; }
 button { width: 24px; height: 24px; font-size: 16px; }
-.single { background-color: lime; }
-.double { background-color: cyan; }
+.single { background: yellow; }
+.double { background: orange; }
 .large { width: 72px; height: 72px; font-size: 48px; }
 .error { width: 72px; height: 72px; font-size: 48px; color: red; }
