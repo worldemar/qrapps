@@ -54,13 +54,14 @@ var solve_board = () => {
 }
 
 var solve_set = (value_set, explanation_set, check_name) => {
+  var values_size = len(value_set)
   var new_values = copy(value_set)
   var new_explanations = copy(explanation_set)
   // any "corellated" set of cells in sudoku
   // should have unique values assigned to each cell
-  for (var i = 0; i < len(value_set); i++) {
+  for (var i = 0; i < values_size; i++) {
     if (len(value_set[i]) == 1) { // have specific value assigned
-      for(var j = 0; j < len(new_values); j++) { // eliminate that value for all other elements of the set
+      for(var j = 0; j < values_size; j++) { // eliminate that value for all other elements of the set
         if (j != i) { // for all other cells (causig cell itself should retain causing value)
           var idx = new_values[j].indexOf(value_set[i][0])
           if (idx > -1) {
@@ -77,37 +78,32 @@ var solve_set = (value_set, explanation_set, check_name) => {
   // any corellated set must not include more than N instances
   // of possible value selections of size N
   // otherwise there would be no way to spread possible values
-  for (var i = 0; i < len(value_set); i++) {
+  for (var i = 0; i < values_size; i++) {
     if (len(value_set[i]) > 1) {
       var count = 0
       var positions = []
-      for (var j = 0; j < len(value_set); j++) {
+      for (var j = 0; j < values_size; j++) {
         if (JSONSTRINGIFY(value_set[i]) == JSONSTRINGIFY(value_set[j])) {
           count += 1
           positions.push(j+1)
         }
       }
       var values = copy(value_set[i])
-      if (count >= len(values)) { // value_set[i] is definitely not in any other cells, even if count covers exactly these values
-        for (var j = 0; j < len(new_values); j++) {
-          if (JSONSTRINGIFY(new_values[j]) != JSONSTRINGIFY(values)) {
-            new_values[j] = new_values[j].filter(e => values.indexOf(e) < 0)
-            var expl = `set ${values} already fully satisfied in ${check_name} - positions ${positions}`
-            if (!new_explanations[j].includes(expl)) {
-              new_explanations[j].push(expl)
-            }
-          }
+      for (var j = 0; j < values_size; j++) {
+        var expl = ''
+        if (count >= len(values) && JSONSTRINGIFY(new_values[j]) != JSONSTRINGIFY(values)) {
+          // value_set[i] is definitely not in any other cells, even if count covers exactly these values
+          new_values[j] = new_values[j].filter(e => values.indexOf(e) < 0)
+          expl = `set ${values} already fully satisfied in ${check_name} - positions ${positions}`
+
         }
-      }
-      if (count > len(values)) { // value_set[i] instances could not possibly cover all values, contradiction
-        for (var j = 0; j < len(value_set); j++) {
-          if (JSONSTRINGIFY(value_set[j]) == JSONSTRINGIFY(values)) {
-            new_values[j] = []
-            var expl = `set ${values} repeats too much: ${count} times`
-            if (!new_explanations[j].includes(expl)) {
-              new_explanations[j].push(expl)
-            }
-          }
+        if (count > len(values) && JSONSTRINGIFY(value_set[j]) == JSONSTRINGIFY(values)) {
+          // value_set[i] instances could not possibly cover all values, contradiction
+          new_values[j] = []
+          expl = `set ${values} repeats too much: ${count} times`
+        }
+        if (expl && !new_explanations[j].includes(expl)) {
+          new_explanations[j].push(expl)
         }
       }
     }
