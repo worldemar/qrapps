@@ -209,19 +209,17 @@ var render_cell = (x, y) => {
 }
 
 var fill_document = () => {
-  var quad_spacing = 2
-  var cell_spacing = 2
-  var table = ''
+  const quad_spacing = 2
+  const cell_spacing = 2
+  var table = '<a class=s>&emsp;</a> = one option left&nbsp;' +
+    '<a class=d>&emsp;</a> = two options left&nbsp;' +
+    '<a class=b onclick=b_l()>Freeze resolved values</a>&nbsp;' +
+    '<a class=b onclick=b_e()>Clear solution</a>'
   for (var indey = 0; indey < 9; indey++) {
     for (var index = 0; index < 9; index++) {
-      table += `<span style="position: absolute; left: ${16 + (index - index % 3) * quad_spacing + index * (24 * 3 + cell_spacing)}; top: ${64 + (indey - indey % 3) * quad_spacing + indey * (24 * 3 + cell_spacing)}" class=cell id=c${index}${indey}></span>`
+      table += `<span style="position: absolute; left: ${16 + (index - index % 3) * quad_spacing + index * (16 * 3 + cell_spacing)}; top: ${64 + (indey - indey % 3) * quad_spacing + indey * (24 * 3 + cell_spacing)}" class=cell id=c${index}${indey}></span>`
     }
   }
-  table = '<a class=s>&emsp;</a> = one option left&nbsp;' +
-    '<a class=d>&emsp;</a> = two options left<br/>' +
-    '<a class=b onclick=b_l()>Freeze resolved values</a>&nbsp;' +
-    '<a class=b onclick=b_e()>Clear solution</a>' +
-    '<p>' + table + '</p>' // this is not a template string since it increases size
   INNERHTML(document.getElementsByTagName('body')[0], table)
 }
 
