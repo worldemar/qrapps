@@ -195,7 +195,7 @@ var render_cell = (x, y) => {
     values = board_possible_values[x][y]
     explanations = board_explanations[x][y]
     if (len(values) == 0) {
-      INNERHTML(cell, button_txt(x, y, 'e', 0, true, 'X', explanations))
+      INNERHTML(cell, button_txt(x, y, 'l', 0, true, 'X', explanations))
     } else {
       var new_html = ''
       for (var i = 1; i <= 9; i++) {
@@ -244,8 +244,7 @@ var autosolve = () => {
   var changes = solve_board()
   render_cells()
   if (changes > 0) {
-    console.log(changes)
-    setTimeout(autosolve, 10)
+    requestAnimationFrame(autosolve)
   }
 }
 

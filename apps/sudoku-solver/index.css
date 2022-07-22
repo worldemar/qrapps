@@ -1,8 +1,7 @@
-body { font-family: sans; }
-table { background: tan; }
-a,table,.b { border-radius: 2px; border: 1px solid grey; }
-button { width: 24px; height: 24px; font-size: 16px; }
-.s { background: yellow; }
-.d { background: orange; }
-.l { width: 72px; height: 72px; font-size: 48px; }
-.e { width: 72px; height: 72px; font-size: 48px; color: red; }
+body { font-family: sans }
+span { background: tan }
+a,.b { border-radius: 2px; border: 1px solid grey }
+button { width: 24px; height: 24px; font-size: 16px }
+.s { background: yellow }
+.d { background: orange }
+.l { width: 72px; height: 72px; font-size: 48px }

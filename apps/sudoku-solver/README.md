@@ -4,7 +4,6 @@ This solver highlights possible values for unfilled cells. All values put on the
 
 This solver also _does not_ try to solve anything that is not directly put on the sudoku board. No cell values are assumed (except for cells that are limited to a single value by sudoku rules), no secondary boards solved with possible values, no heuristics, X-wing, Y-wing, Swordfish, XYZ-wing or any other advanced techniques applied.
 
-
 **This helper only checks for basic sudoku rules an consequences to them**:
 - unique values in: rows, columns, quadrants (contemporary sudoku rules)
   - A row/column/quadrant must not have more than **one** occurence of every single value.
