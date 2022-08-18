@@ -26,6 +26,12 @@ Each app is HTML/JS/CSS webpage contained within own directory in `apps`. Script
 
 ## Collection of QR apps!
 Generated automatically on push and published to https://worldemar.github.io/qrapps/
+### [bike-chain-wear-calculator](bike-chain-wear-calculator/index.html)
+
+Bike chain wear calculator. Displays relative bike chain wear for cases when chainring has common divisors with chain length. Choosing these incorrectly may cause certain chain segments to wear way more than others and chain becoming unusable much earlier than it's designed lifespan.
+
+![bike-chain-wear-calculator](bike-chain-wear-calculator/qr.png)
+
 ### [demo-canvas](demo-canvas/index.html)
 
 Simple demo showcasing mouse tracking and canvas drawing
