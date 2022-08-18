@@ -1,0 +1,28 @@
+canvas {
+    border: 4px solid black;
+}
+div {
+    padding: 4px;
+}
+body {
+    background-color: darkslategray;
+    color: lightgray;
+    font-family: sans-serif;
+}
+span {
+    font-family: monospace;
+    background-color: black;
+    color: white;
+    font-size: large;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+input {
+    font-size: large;
+    border: 1px solid gray;
+    background-color: darkslategray;
+    color: white;
+    border-radius: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
