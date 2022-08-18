@@ -1,0 +1,1 @@
+Bike chain wear calculator. Displays relative bike chain wear for cases when chainring has common divisors with chain length. Choosing these incorrectly may cause certain chain segments to wear way more than others and chain becoming unusable much earlier than it's designed lifespan.
