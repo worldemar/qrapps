@@ -148,10 +148,11 @@ def main():
     url_size = os.stat(url_filename).st_size
     print(f'URL data size: {url_size} of 2953 (QR capacity)')
 
-    url_to_qr(
-        url_filename,
-        png_filename
-    )
+    if url_size <= 2953:
+        url_to_qr(
+            url_filename,
+            png_filename
+        )
 
 
 if __name__ == '__main__':
