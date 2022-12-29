@@ -315,7 +315,7 @@ var init = () => {
   body.style.margin = 0
   body.style.textAlign = 'center'
   canvas = get_element_by_tag('canvas')
-  canvas.width = canvas.height = board_size = Math.min(body.clientWidth, body.clientHeight) * ( 26 / 28 )
+  canvas.width = canvas.height = board_size = Math.max(720, Math.min(body.clientWidth, body.clientHeight)) * ( 26 / 28 )
   ctx = canvas.getContext('2d')
 
   add_event_listener(canvas, 'click', click)
