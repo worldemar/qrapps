@@ -1,21 +1,16 @@
-name: prospector
+name: Prospector
 
 on:
   pull_request:
 
 jobs:
   prospector:
-    runs-on: windows-2022
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: install dependencies
-      run: |
-        pip install -r requirements.txt
-        pip install -r requirements-contrib.txt
-    - name: lint with prospector
-      run: |
-        prospector
+      - uses: actions/checkout@v2
+      - name: build ci environment
+        run: |
+          docker build --pull --rm -t qrapps:ci .
+      - name: lint with prospector
+        run: |
+          docker run --rm -it -v .:/src -w /src --entrypoint=prospector qrapps:ci

@@ -53,21 +53,21 @@ def url_to_qr(url_filename, png_filename):
 
 def inline_scripts(html_filename, out_filename):
     subprocess.check_call([
-        'inline-script-tags.cmd',
+        'inline-script-tags',
         html_filename,
         out_filename])
 
 
 def inline_stylesheets(html_filename, out_filename):
     subprocess.check_call([
-        'inline-stylesheets.cmd',
+        'inline-stylesheets',
         html_filename,
         out_filename])
 
 
 def minify(html_filename, out_filename, config_file):
     subprocess.check_call([
-        'html-minifier.cmd',
+        'html-minifier',
         '--config-file', config_file,
         html_filename,
         '--output', out_filename])
@@ -84,7 +84,7 @@ def uglify(html_dir, html_tmp_dir):
     js_pairs = zip(js_files, js_tmp_files)
     for js_pair in js_pairs:
         subprocess.check_call([
-            'uglifyjs.cmd',
+            'uglifyjs',
             '--output', js_pair[1],
             '--warn',
             '--config-file', os.path.join(html_dir, 'uglify.json'),

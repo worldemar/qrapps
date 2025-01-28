@@ -1,33 +1,16 @@
-name: test bundles
+name: Test Bundles
 
 on:
     pull_request:
 
 jobs:
   bundle:
-    runs-on: windows-2022
-
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v2
- 
-      - name: set up python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
- 
-      - name: install python dependencies
+      - name: build ci environment
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-
-      - name: set up npm
-        run: |
-          npm install -g uglify-js
-          npm install -g html-minifier
-          npm install -g inline-scripts
-
+          docker build --pull --rm -t qrapps:ci .
       - name: generate QR
         run: |
-          python qrs.py --htmldirs=apps --builddir=bundles
-
-
+          docker run --rm -it -v .:/src -w /src qrapps:ci qrs.py --htmldirs=apps --builddir=bundles
