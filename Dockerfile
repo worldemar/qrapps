@@ -1,25 +1,21 @@
-# Self-contained environment
+# Self-contained environment, useful commands:
 #
-# Build environment:
+# Build environment image:
 # docker build --pull --rm -t qrapps:ci .
 #
-# Run interactive shell, useful for debugging:
+# After image has been built, you can run:
+#
+# Interactive shell, useful for debugging:
 # docker run --rm -it -v .:/src -w /src --entrypoint=bash qrapps:ci
 #
-# Check code quality:
-# docker run --rm -it -v .:/src -w /src --entrypoint=prospector qrapps:ci
+# Code quality check:
+# docker run --rm -v .:/src -w /src --entrypoint=prospector qrapps:ci
 #
 # Convert everything to QR codes:
-# docker run --rm -it -v .:/src -w /src qrapps:ci qrs.py --htmldirs=apps --builddir=bundles
+# docker run --rm -v .:/src -w /src qrapps:ci qrs.py --htmldirs=apps --builddir=bundles
 # 
 # Convert single app to QR code:
-# docker run --rm -it -v .:/src -w /src qrapps:ci qr.py --htmldir=apps/demo-clock --builddir=bundles
-#
-# Then run commands from within the build environment, for example
-# docker run --rm -it -u $(id -u):$(id -g) -v $(pwd):/usr/src -w /usr/src curl/curl autoreconf -fi
-# docker run --rm -it -u $(id -u):$(id -g) -v $(pwd):/usr/src -w /usr/src curl/curl ./configure --without-ssl --without-libpsl
-# docker run --rm -it -u $(id -u):$(id -g) -v $(pwd):/usr/src -w /usr/src curl/curl make
-# docker run --rm -it -u $(id -u):$(id -g) -v $(pwd):/usr/src -w /usr/src curl/curl ./scripts/maketgz 8.7.1
+# docker run --rm -v .:/src -w /src qrapps:ci qr.py --htmldir=apps/demo-clock --builddir=bundles
 
 from debian:12
 
