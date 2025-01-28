@@ -27,5 +27,5 @@ jobs:
           git config --global user.name "Vladimir Looze"
           git add docs
           git commit -m "release new bundles"
-          git push origin main
+          git push --force origin main
  
