@@ -15,6 +15,16 @@ All apps follow same rules:
 These codes can be scanned by your device of choice and content pasted directly into browser URL.
 Since QR code content is [Data URL](https://en.wikipedia.org/wiki/Data_URI_scheme), it contains everything needed within itself.
 
+## How to contribute?
+- Create directory in `apps` with appropriate name, then add to it:
+    - `index.html` - main app layout file
+    - `index.js` - app source code
+    - `minify.json` and `uglify.json` - compression configs
+    - `README.md` - app description
+
+    (see `demo-*` apps for file content examples)
+- Use build instructions from [Dockerfile](Dockerfile)
+
 ## Why would you do that?
 For fun, challenge and as a demonstration of modern browser capabilities.
 Fitting entire app in one QR code also keeps them relatively small and simple... until author tries to squeeze code too hard and it becomes unreadeable 😂
