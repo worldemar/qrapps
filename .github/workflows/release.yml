@@ -19,14 +19,16 @@ jobs:
         run: |
           rm -rf docs
           mv bundles docs
-          git checkout -- docs/_config.yml
+          ls -la docs
+          sudo git checkout -- docs/_config.yml
+          ls -la docs
           docker run --rm -v .:/src -w /src qrapps:ci release.py
-          tree /f docs
+          ls -la docs
       - name: release
         run: |
           git config --global user.email "woldemar@mimas.ru"
           git config --global user.name "Vladimir Looze"
           git add docs
           git commit -m "release new bundles"
-          git push origin main
+# git push origin main
  
