@@ -13,4 +13,4 @@ jobs:
           docker build --pull --rm -t qrapps:ci .
       - name: lint with prospector
         run: |
-          docker run --rm -it -v .:/src -w /src --entrypoint=prospector qrapps:ci
+          docker run --rm -v .:/src -w /src --entrypoint=prospector qrapps:ci

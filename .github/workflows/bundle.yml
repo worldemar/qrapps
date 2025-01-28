@@ -13,4 +13,4 @@ jobs:
           docker build --pull --rm -t qrapps:ci .
       - name: generate QR
         run: |
-          docker run --rm -it -v .:/src -w /src qrapps:ci qrs.py --htmldirs=apps --builddir=bundles
+          docker run --rm -v .:/src -w /src qrapps:ci qrs.py --htmldirs=apps --builddir=bundles

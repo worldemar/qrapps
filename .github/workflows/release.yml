@@ -14,13 +14,13 @@ jobs:
           docker build --pull --rm -t qrapps:ci .
       - name: generate QR
         run: |
-          docker run --rm -it -v .:/src -w /src qrapps:ci qrs.py --htmldirs=apps --builddir=bundles
+          docker run --rm -v .:/src -w /src qrapps:ci qrs.py --htmldirs=apps --builddir=bundles
       - name: generate README.md
         run: |
           rm -rf docs
           mv bundles docs
           git checkout -- docs/_config.yml
-          docker run --rm -it -v .:/src -w /src qrapps:ci release.py
+          docker run --rm -v .:/src -w /src qrapps:ci release.py
           tree /f docs
       - name: release
         run: |
