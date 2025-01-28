@@ -19,7 +19,7 @@ jobs:
         run: |
           rm -rf docs
           mv bundles docs
-          git checkout -- docs/_config.yml
+          sudo git checkout -- docs/_config.yml
           docker run --rm -v .:/src -w /src qrapps:ci release.py
           tree /f docs
       - name: release
