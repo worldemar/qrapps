@@ -36,27 +36,11 @@ Each app is HTML/JS/CSS webpage contained within own directory in `apps`. Script
 
 ## Collection of QR apps!
 Generated automatically on push and published to https://worldemar.github.io/qrapps/
-### [demo-shader](demo-shader/index.html)
+### [demo-canvas](demo-canvas/index.html)
 
-Simple demo showcasing fragment shader using WebGL.
-Contains minimal (about 50 lines, just over 1kb compressed) of boilerplate code to run single fragment shader.
-Mandelbrot set shader added for demonstration purposes based on [WebGL101](https://github.com/emoller/WebGL101) fragment shader example. Controls are cursor keys, `+` and `-`.
+Simple demo showcasing mouse tracking and canvas drawing
 
-![demo-shader](demo-shader/qr.png)
-
-### [spectrogram](spectrogram/index.html)
-
-A relatively straightforward implementation of spectrogram.
-The QR for this app might be rather useless, since `mediaDevices`
-are only available for HTTPS on Android devices and not available
-for Data URL on any platform I have available.
-
-![spectrogram](spectrogram/qr.png)
-
-### [demo-geometry](demo-geometry/index.html)
-
-Geometry demo inspired by old ZX Spectrum demoscene.
-![demo-geometry](demo-geometry/qr.png)
+![demo-canvas](demo-canvas/qr.png)
 
 ### [demo-shader-julia](demo-shader-julia/index.html)
 
@@ -69,17 +53,49 @@ Loading external shader file is rather difficult to implement within Data URL.
 
 ![demo-shader-julia](demo-shader-julia/qr.png)
 
-### [demo-clock](demo-clock/index.html)
+### [demo-shader](demo-shader/index.html)
 
-Simplest demo showcasing proof-of-concept.
+Simple demo showcasing fragment shader using WebGL.
+Contains minimal (about 50 lines, just over 1kb compressed) of boilerplate code to run single fragment shader.
+Mandelbrot set shader added for demonstration purposes based on [WebGL101](https://github.com/emoller/WebGL101) fragment shader example. Controls are cursor keys, `+` and `-`.
 
-![demo-clock](demo-clock/qr.png)
+![demo-shader](demo-shader/qr.png)
+
+### [demo-glcube](demo-glcube/index.html)
+
+Simple demo showcasing rotating cube using WebGL.
+Uses internal 600-character matrix library and no engine.
+Fitting it into QR code was not easy nor pretty, some parts of code are not very readable.
+Building more complex WebGL app would likely require different approach (shaders?)
+or more agressive minifying/uglifying
+
+![demo-glcube](demo-glcube/qr.png)
 
 ### [bike-chain-wear-calculator](bike-chain-wear-calculator/index.html)
 
 Bike chain wear calculator. Displays relative bike chain wear for cases when chainring has common divisors with chain length. Choosing these incorrectly may cause certain chain segments to wear way more than others and chain becoming unusable much earlier than it's designed lifespan.
 
 ![bike-chain-wear-calculator](bike-chain-wear-calculator/qr.png)
+
+### [spectrogram](spectrogram/index.html)
+
+A relatively straightforward implementation of spectrogram.
+The QR for this app might be rather useless, since `mediaDevices`
+are only available for HTTPS on Android devices and not available
+for Data URL on any platform I have available.
+
+![spectrogram](spectrogram/qr.png)
+
+### [demo-clock](demo-clock/index.html)
+
+Simplest demo showcasing proof-of-concept.
+
+![demo-clock](demo-clock/qr.png)
+
+### [demo-geometry](demo-geometry/index.html)
+
+Geometry demo inspired by old ZX Spectrum demoscene.
+![demo-geometry](demo-geometry/qr.png)
 
 ### [sudoku-solver](sudoku-solver/index.html)
 
@@ -101,20 +117,4 @@ This solver also _does not_ try to solve anything that is not directly put on th
 Please note, that even this very simple solver witout any heuristics whatsoever is powerful enough to resolve most sudoku puzzles except really hard ones. Usage of this tool *may* decrease your enjoyment of solving sudoku by yourself. I enjoyed writing it, though 😄
 
 ![sudoku-solver](sudoku-solver/qr.png)
-
-### [demo-glcube](demo-glcube/index.html)
-
-Simple demo showcasing rotating cube using WebGL.
-Uses internal 600-character matrix library and no engine.
-Fitting it into QR code was not easy nor pretty, some parts of code are not very readable.
-Building more complex WebGL app would likely require different approach (shaders?)
-or more agressive minifying/uglifying
-
-![demo-glcube](demo-glcube/qr.png)
-
-### [demo-canvas](demo-canvas/index.html)
-
-Simple demo showcasing mouse tracking and canvas drawing
-
-![demo-canvas](demo-canvas/qr.png)
 
