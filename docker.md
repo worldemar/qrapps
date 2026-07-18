@@ -27,7 +27,7 @@ Opens an interactive bash shell with all dependencies installed and your local c
 docker-compose run --rm lint
 ```
 
-Runs prospector linting on Python code.
+Runs ruff linting on Python code.
 
 ## Convert Everything to QR Codes
 

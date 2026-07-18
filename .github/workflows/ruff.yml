@@ -1,16 +1,16 @@
-﻿name: Prospector
+﻿name: ruff
 
 on:
   pull_request:
 
 jobs:
-  prospector:
+  ruff:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: build ci environment
         run: |
           docker-compose build
-      - name: lint with prospector
+      - name: lint with ruff
         run: |
           docker-compose run --rm lint
