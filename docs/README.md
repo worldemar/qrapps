@@ -1,6 +1,6 @@
-[![CodeQL](https://github.com/worldemar/qrapps/actions/workflows/codeql.yml/badge.svg)](https://github.com/worldemar/qrapps/actions/workflows/codeql.yml)
+﻿[![CodeQL](https://github.com/worldemar/qrapps/actions/workflows/codeql.yml/badge.svg)](https://github.com/worldemar/qrapps/actions/workflows/codeql.yml)
 [![GutHub Pages](https://github.com/worldemar/qrapps/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/worldemar/qrapps/actions/workflows/pages/pages-build-deployment)
-[![prospector](https://github.com/worldemar/qrapps/actions/workflows/prospector.yml/badge.svg)](https://github.com/worldemar/qrapps/actions/workflows/prospector.yml)
+[![ruff](https://github.com/worldemar/qrapps/actions/workflows/ruff.yml/badge.svg)](https://github.com/worldemar/qrapps/actions/workflows/ruff.yml)
 
 # QR Code Apps
 
@@ -24,6 +24,7 @@ Since QR code content is [Data URL](https://en.wikipedia.org/wiki/Data_URI_schem
 
     (see `demo-*` apps for file content examples)
 - Use build instructions from [Dockerfile](Dockerfile)
+- See [docker.md](docker.md) for Docker Compose commands
 
 ## Why would you do that?
 For fun, challenge and as a demonstration of modern browser capabilities.
@@ -85,6 +86,13 @@ are only available for HTTPS on Android devices and not available
 for Data URL on any platform I have available.
 
 ![spectrogram](spectrogram/qr.png)
+
+### [demo-segmented-clock](demo-segmented-clock/index.html)
+
+# Segmented Clock
+
+A digital clock display using 7-segment display style. Shows hours, minutes, and seconds with blinking colons between them. 
+![demo-segmented-clock](demo-segmented-clock/qr.png)
 
 ### [demo-clock](demo-clock/index.html)
 
