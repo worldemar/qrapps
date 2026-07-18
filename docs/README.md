@@ -92,6 +92,7 @@ for Data URL on any platform I have available.
 # Segmented Clock
 
 A digital clock display using 7-segment display style. Shows hours, minutes, and seconds with blinking colons between them. 
+
 ![demo-segmented-clock](demo-segmented-clock/qr.png)
 
 ### [demo-clock](demo-clock/index.html)
