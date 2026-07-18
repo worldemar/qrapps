@@ -1,4 +1,4 @@
-name: Release Bundles
+﻿name: Release Bundles
 
 on:
   push:
@@ -8,20 +8,20 @@ jobs:
   bundle:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: build ci environment
         run: |
-          docker build --pull --rm -t qrapps:ci .
+          docker-compose build
       - name: generate QR
         run: |
-          docker run --rm -v .:/src -w /src qrapps:ci qrs.py --htmldirs=apps --builddir=bundles
+          docker-compose run --rm qrs
       - name: generate README.md
         run: |
           rm -rf docs
           mv bundles docs
           sudo cp -at docs .google/*
           sudo git checkout -- docs/_config.yml
-          docker run --rm -v .:/src -w /src qrapps:ci release.py
+          docker-compose run --rm release
       - name: release
         run: |
           git config --global user.email "woldemar@mimas.ru"
@@ -29,4 +29,3 @@ jobs:
           git add docs
           git commit -m "release new bundles"
           git push --force origin main
- 

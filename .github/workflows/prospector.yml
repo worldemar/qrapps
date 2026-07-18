@@ -1,4 +1,4 @@
-name: Prospector
+﻿name: Prospector
 
 on:
   pull_request:
@@ -7,10 +7,10 @@ jobs:
   prospector:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: build ci environment
         run: |
-          docker build --pull --rm -t qrapps:ci .
+          docker-compose build
       - name: lint with prospector
         run: |
-          docker run --rm -v .:/src -w /src --entrypoint=prospector qrapps:ci
+          docker-compose run --rm lint

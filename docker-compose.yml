@@ -1,0 +1,95 @@
+﻿# Docker Compose for QR Apps project
+
+services:
+  # Interactive shell for debugging
+  shell:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/src
+    working_dir: /src
+    entrypoint: bash
+    stdin_open: true
+    tty: true
+
+  # Code quality check with prospector
+  lint:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/src
+    working_dir: /src
+    entrypoint: prospector
+
+  # Convert all apps to QR codes
+  qrs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/src
+    working_dir: /src
+    command: ["qrs.py", "--htmldirs=apps", "--builddir=bundles"]
+
+  # Convert single app to QR code
+  # Usage: docker-compose run --rm qr --htmldir=apps/demo-clock --builddir=bundles
+  qr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/src
+    working_dir: /src
+    entrypoint: ["python3", "qr.py"]
+
+  # Generate release documentation
+  release:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/src
+    working_dir: /src
+    command: ["release.py"]
+
+  # Run uglify-js
+  uglifyjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/src
+    working_dir: /src
+    entrypoint: uglifyjs
+
+  # Run html-minifier
+  html-minifier:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/src
+    working_dir: /src
+    entrypoint: html-minifier
+
+  # Run inline-script-tags
+  inline-script-tags:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/src
+    working_dir: /src
+    entrypoint: inline-script-tags
+
+  # Run inline-stylesheets
+  inline-stylesheets:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/src
+    working_dir: /src
+    entrypoint: inline-stylesheets

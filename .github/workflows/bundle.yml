@@ -1,4 +1,4 @@
-name: Test Bundles
+﻿name: Test Bundles
 
 on:
     pull_request:
@@ -7,10 +7,10 @@ jobs:
   bundle:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: build ci environment
         run: |
-          docker build --pull --rm -t qrapps:ci .
+          docker-compose build
       - name: generate QR
         run: |
-          docker run --rm -v .:/src -w /src qrapps:ci qrs.py --htmldirs=apps --builddir=bundles
+          docker-compose run --rm qrs
