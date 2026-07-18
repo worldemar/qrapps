@@ -157,13 +157,13 @@ var board_size = null
 
 var color_background = 'white'
 
-var color_board_background = '#FFFFE0'
-var color_board_foreground = '#808080'
-var color_board_grid = '#808080'
-var color_value_impossible_foreground = '#E0E0E0'
-var color_value_selected_foreground = '#4040F0'
-var color_value_locked_foreground = '#404040'
-var color_value_error_foreground = '#FF4040'
+var color_board_background = '#FFE'
+var color_board_foreground = '#888'
+var color_board_grid = '#888'
+var color_value_impossible_foreground = '#EEE'
+var color_value_selected_foreground = '#44F'
+var color_value_locked_foreground = '#444'
+var color_value_error_foreground = '#F44'
 
 var mouse_in_rect = (rect) => {
   var mouse_in_rect_x = mouse_x - rect[0]
