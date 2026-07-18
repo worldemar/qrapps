@@ -19,6 +19,7 @@ jobs:
         run: |
           rm -rf docs
           mv bundles docs
+          sudo cp -at docs .google/*
           sudo git checkout -- docs/_config.yml
           docker run --rm -v .:/src -w /src qrapps:ci release.py
       - name: release
