@@ -16,7 +16,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    for package in os.listdir(args.htmldirs):
+    for package in sorted(os.listdir(args.htmldirs)):
         print(f'Processing package {package}')
         subprocess.check_call([
             sys.executable, 'qr.py',

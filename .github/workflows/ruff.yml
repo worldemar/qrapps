@@ -1,16 +1,16 @@
-﻿name: Test Bundles
+﻿name: ruff
 
 on:
-    pull_request:
+  pull_request:
 
 jobs:
-  bundle:
+  ruff:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: build ci environment
         run: |
           docker compose build
-      - name: generate QR
+      - name: lint with ruff
         run: |
-          docker compose run --rm qrs
+          docker compose run --rm lint
